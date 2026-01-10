@@ -48,6 +48,31 @@ def startup():
     except Exception as e:
         print(f"[STARTUP] Warning: Vector DB check failed: {e}")
 
+    # --- AUTO-DEPLOYMENT: SCHEDULER (The Heartbeat) ---
+    # Start the 6-hour loop in a background thread so it runs alongside the API
+    import threading
+    from backend.scheduler.run_agents import run_pipeline
+    import schedule
+    import time
+
+    def scheduler_loop():
+        print("[SCHEDULER] Background thread started.")
+        # Run once immediately
+        try:
+            run_pipeline()
+        except Exception as e:
+            print(f"[SCHEDULER] Initial run failed: {e}")
+            
+        schedule.every(6).hours.do(run_pipeline)
+        while True:
+            schedule.run_pending()
+            time.sleep(60)
+
+    # Daemon thread dies when main app dies
+    thread = threading.Thread(target=scheduler_loop, daemon=True)
+    thread.start()
+    print("[STARTUP] Scheduler thread launched.")
+
 @app.get("/api/board/status")
 def get_board_status():
     """Get the latest Board Verdict and Agent Signals."""
