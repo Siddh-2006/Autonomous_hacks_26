@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Auto-Diligence | Autonomous Investor System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #0b0f14;
@@ -347,6 +348,13 @@
             margin-bottom: 4px;
         }
 
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -407,15 +415,27 @@
                     <!-- Key Stats Row -->
                     <div class="card" style="grid-column:span 4">
                         <h3>CFO Financial Mode</h3>
-                        <div id="cfo-mode" style="font-size: 24px; font-weight: 600;">--</div>
+                        <div id="cfo-mode" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">--</div>
+                        <!-- Mini Chart Placeholder -->
+                        <div style="font-size: 11px; color: var(--muted);">Based on hiring velocity</div>
                     </div>
                     <div class="card" style="grid-column:span 4">
                         <h3>CEO Strategy Drift</h3>
-                        <div id="ceo-drift" style="font-size: 24px; font-weight: 600;">--</div>
+                        <div id="ceo-drift" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">--</div>
+                        <div style="font-size: 11px; color: var(--muted);">Semantic distance from baseline</div>
                     </div>
                     <div class="card" style="grid-column:span 4">
                         <h3>CTO Velocity</h3>
-                        <div id="cto-health" style="font-size: 24px; font-weight: 600;">--</div>
+                        <div id="cto-health" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">--</div>
+                        <div style="font-size: 11px; color: var(--muted);">Commit cadence consistency</div>
+                    </div>
+
+                    <!-- VISUALS: History Chart -->
+                    <div class="card" style="grid-column:span 12">
+                        <h3>Risk Trend Analysis (Six Month Window)</h3>
+                        <div class="chart-container">
+                            <canvas id="riskChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -481,13 +501,41 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
-            event.currentTarget.classList.add('active'); // Fixed target issue
+            event.currentTarget.classList.add('active');
         }
+
+        // --- Charts Init ---
+        let riskChartCtx = document.getElementById('riskChart').getContext('2d');
+        let riskChart = new Chart(riskChartCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Risk Confidence Score',
+                    data: [],
+                    borderColor: '#5eead4',
+                    backgroundColor: 'rgba(94, 234, 212, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#0b0f14',
+                    pointBorderColor: '#5eead4',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, max: 1.0, grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } },
+                    x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                }
+            }
+        });
+
 
         // --- Data Logic (Real-Time) ---
         const API_URL = "http://localhost:8000/api/board/status";
-        // Note: On production deploy, this URL should be updated or relative if served from same origin. 
-        // For now assuming localhost dev.
 
         async function fetchData() {
             try {
@@ -513,9 +561,9 @@
             elRisk.innerText = risk.toUpperCase();
 
             // Color coding
-            if (risk === 'Critical' || risk === 'High') { elRisk.style.color = 'var(--danger)'; }
-            else if (risk === 'Medium') { elRisk.style.color = 'var(--warning)'; }
-            else { elRisk.style.color = 'var(--success)'; }
+            if (risk === 'Critical' || risk === 'High') { elRisk.style.color = 'var(--danger)'; riskChart.data.datasets[0].borderColor = '#fb7185'; }
+            else if (risk === 'Medium') { elRisk.style.color = 'var(--warning)'; riskChart.data.datasets[0].borderColor = '#facc15'; }
+            else { elRisk.style.color = 'var(--success)'; riskChart.data.datasets[0].borderColor = '#22c55e'; }
 
             document.getElementById('risk-label').innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}%`;
 
@@ -564,26 +612,37 @@
             // 4. Timeline
             const timelineDiv = document.getElementById('timeline-container');
             timelineDiv.innerHTML = '';
-            if (history.length === 0) {
-                timelineDiv.innerHTML = '<div class="event">No history recorded yet.</div>';
-            } else {
+
+            // Update Chart Data based on History
+            if (history.length > 0) {
+                // Reverse because history comes DESC (newest first), but charts need ASC (oldest first)
+                const sortedHistory = [...history].reverse();
+
+                const labels = sortedHistory.map(h => new Date(h.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                const scores = sortedHistory.map(h => h.confidence); // Visualization confidence as 'risk magnitude' proxy or map Risk Level to 0-1
+
+                riskChart.data.labels = labels;
+                riskChart.data.datasets[0].data = scores;
+                riskChart.update();
+
                 history.forEach(h => {
                     const div = document.createElement('div');
                     div.className = 'event';
                     const riskColor = h.overall_risk === 'High' ? 'red' : (h.overall_risk === 'Medium' ? 'yellow' : 'green');
                     div.innerHTML = `
                 <div class="event-time">${new Date(h.timestamp).toLocaleDateString()}</div>
-                <div class="event-body">${h.reason}</div>
+                <div class="event-body">${h.summary || h.reason}</div>
                 <span class="tag ${riskColor}">${h.overall_risk}</span>
             `;
                     timelineDiv.appendChild(div);
                 });
+            } else {
+                timelineDiv.innerHTML = '<div class="event">No history recorded yet.</div>';
             }
 
             // 5. Logs (Simulated from signals)
             const logsDiv = document.getElementById('logs-container');
             logsDiv.innerHTML = '';
-            // Just showing timestamps of last updates
             const updates = [
                 { src: 'SYSTEM', msg: `Board analysis complete. Risk: ${risk}` },
                 { src: 'CFO', msg: `Processed job items. Verdict: ${agents.cfo?.financial_mode}` },

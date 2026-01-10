@@ -23,6 +23,30 @@ app.add_middleware(
 @app.on_event("startup")
 def startup():
     init_db()
+    
+    # --- AUTO-DEPLOYMENT: VECTOR DB ---
+    # Check if we need to hydrate the "Brain" (First run on Cloud)
+    from backend.storage.vector_db import vector_memory
+    try:
+        count = vector_memory.collection.count()
+        print(f"[STARTUP] Vector Memory Count: {count}")
+        if count < 5:
+            print("[STARTUP] Fresh deployment detected. Auto-seeding Vector DB...")
+            # 1. Backfill CEO Strategy (2 Years)
+            from backend.vectors.backfill import backfill_historical_data
+            backfill_historical_data()
+            
+            # 2. Seed CFO Risk Archetypes
+            from backend.storage.seed_archetypes import seed_risk_archetypes
+            seed_risk_archetypes()
+            
+            # 3. Seed SQLite History (Timeline)
+            from backend.db.seed_history import seed_executive_history
+            seed_executive_history()
+            
+            print("[STARTUP] Seeding Complete. System is ready.")
+    except Exception as e:
+        print(f"[STARTUP] Warning: Vector DB check failed: {e}")
 
 @app.get("/api/board/status")
 def get_board_status():
