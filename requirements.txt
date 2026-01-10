@@ -1,3 +1,6 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+sentence-transformers==3.3.1
 requests==2.32.3
 beautifulsoup4==4.12.3
 fastapi==0.115.6
@@ -7,5 +10,4 @@ lxml==5.3.0
 pytest==8.3.4
 schedule==1.2.2
 chromadb==0.6.0
-sentence-transformers==3.3.1
 numpy==1.26.4
