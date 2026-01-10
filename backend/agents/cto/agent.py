@@ -53,9 +53,20 @@ class CTOAgent(BaseAgent):
              severity = "Low"
              explanation = f"Accelerating development velocity ({velocity_change_pct:.1f}% increase)."
 
+        # --- NEW: Bus Factor Analysis (Elite Metric) ---
+        # "Bus Factor": If minimal contributors but high commits -> Risk of Knowledge Silo
+        contributors = metrics.get('active_contributors', 0)
+        if contributors < 3 and current_commits > 50:
+             severity = "Medium"
+             explanation += " [WARNING: Bus Factor Risk. High output depends on <3 engineers.]"
+             # Correlate with 'Tech Debt' - rushing without review?
+        
         # 3. Construct Output
         signal = {
             "agent": "CTO",
+            "execution_health": execution_health,
+            "severity": severity,
+            "bus_factor_risk": contributors < 3 and current_commits > 50, # Structured Signal
             "execution_health": execution_health,
             "severity": severity,
             "confidence": 0.9 if metrics['active_contributors'] > 0 else 0.5,

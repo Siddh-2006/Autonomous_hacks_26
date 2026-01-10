@@ -595,7 +595,12 @@
         <tr>
             <td>Execution</td>
             <td style="color:${agents.cto?.execution_health === 'Declining' ? 'var(--danger)' : 'var(--success)'}">${agents.cto?.execution_health}</td>
-            <td>CTO Repo Activity</td>
+            <td>
+                CTO Activity 
+                <span style="display:block; font-size:10px; color:var(--muted); margin-top:2px;">
+                    ${agents.cto?.bus_factor_risk ? '⚠️ High Bus Factor Risk' : '✅ Distributed Knowledge'}
+                </span>
+            </td>
         </tr>
         <tr>
             <td>Financial</td>
