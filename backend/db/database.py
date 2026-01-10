@@ -1,14 +1,9 @@
 import sqlite3
 import os
 from datetime import datetime
+import json
 
-CFO_DB_PATH = os.path.join(os.path.dirname(__file__), 'cfo.db')
-CTO_DB_PATH = os.path.join(os.path.dirname(__file__), 'cto_agent.db')
-
-def get_cfo_db_connection():
-    conn = sqlite3.connect(CFO_DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+DB_PATH = os.path.join(os.path.dirname(__file__), 'cfo.db')
 
 def get_cto_db_connection():
     conn = sqlite3.connect(CTO_DB_PATH)
@@ -63,63 +58,51 @@ def get_latest_cfo_snapshot():
         return dict(snapshot)
     return None
 
-def get_all_cfo_snapshots():
-    conn = get_cfo_db_connection()
-    snapshots = conn.execute('SELECT * FROM cfo_snapshots ORDER BY timestamp ASC').fetchall()
+def get_all_snapshots():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM cfo_snapshots ORDER BY timestamp DESC')
+    rows = c.fetchall()
     conn.close()
-    return [dict(row) for row in snapshots]
+    return [dict(row) for row in rows]
 
-# CTO Functions (new)
-def insert_cto_snapshot(data: dict):
-    conn = get_cto_db_connection()
-    conn.execute('''
-        INSERT INTO cto_snapshots (
-            timestamp, total_commits, commit_velocity_change_pct,
-            active_contributors, consistency_score, release_cadence,
-            core_repo_activity, execution_health, severity, confidence, explanation
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+def insert_ceo_snapshot(data):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO ceo_snapshots (timestamp, narrative_health, severity, confidence, forward_looking_score, defensive_score, sentiment_trend, explanation, raw_signals)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
-        data.get('timestamp'),
-        data.get('signals', {}).get('commit_velocity_change_pct', 0) + data.get('signals', {}).get('commit_velocity_change_pct', 0),  # total commits approximation
-        data.get('signals', {}).get('commit_velocity_change_pct'),
-        data.get('signals', {}).get('active_contributors'),
-        data.get('signals', {}).get('consistency_score'),
-        data.get('signals', {}).get('release_cadence'),
-        data.get('signals', {}).get('core_repo_activity'),
-        data.get('execution_health'),
-        data.get('severity'),
-        data.get('confidence'),
-        data.get('explanation')
+        datetime.now().isoformat(),
+        data['narrative_health'],
+        data['severity'],
+        data['confidence'],
+        data['forward_looking_score'],
+        data['defensive_score'],
+        data['sentiment_trend'],
+        data['explanation'],
+        json.dumps(data.get('raw_signals', {}))
     ))
     conn.commit()
     conn.close()
 
-def get_latest_cto_snapshot():
-    conn = get_cto_db_connection()
-    snapshot = conn.execute('SELECT * FROM cto_snapshots ORDER BY timestamp DESC LIMIT 1').fetchone()
+def get_latest_ceo_snapshot():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM ceo_snapshots ORDER BY timestamp DESC LIMIT 1')
+    row = c.fetchone()
     conn.close()
-    if snapshot:
-        return dict(snapshot)
+    if row:
+        return dict(row)
     return None
 
-def get_all_cto_snapshots():
-    conn = get_cto_db_connection()
-    snapshots = conn.execute('SELECT * FROM cto_snapshots ORDER BY timestamp ASC').fetchall()
+def get_ceo_history(limit=5):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM ceo_snapshots ORDER BY timestamp DESC LIMIT ?', (limit,))
+    rows = c.fetchall()
     conn.close()
-    return [dict(row) for row in snapshots]
-
-# Legacy functions for backward compatibility
-def get_db_connection():
-    return get_cfo_db_connection()
-
-def insert_snapshot(data: dict):
-    return insert_cfo_snapshot(data)
-
-def get_latest_snapshot():
-    return get_latest_cfo_snapshot()
-
-def get_all_snapshots():
-    return get_all_cfo_snapshots()
+    return [dict(row) for row in rows]
 
 # Initialize on module load or manually
 if __name__ == "__main__":
