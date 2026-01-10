@@ -189,7 +189,7 @@ class CFOAgent(BaseAgent):
 ## 3. Auditor Recommendation
 Monitor for further divergence between management statements (Press Releases) and operational reality (Hiring/Spending).
 """
-        with open("d:/Autonomous _hacks/auto-diligence/CFO_MEMO.md", "w", encoding="utf-8") as f:
+        with open("CFO_MEMO.md", "w", encoding="utf-8") as f:
             f.write(memo)
 
 if __name__ == "__main__":

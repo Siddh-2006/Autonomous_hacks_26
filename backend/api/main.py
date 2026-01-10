@@ -44,8 +44,9 @@ def startup():
         if count < 5:
             print("[STARTUP] Fresh deployment detected. Auto-seeding Vector DB...")
             # 1. Backfill CEO Strategy (2 Years)
-            from backend.vectors.backfill import backfill_historical_data
-            backfill_historical_data()
+            # 1. Backfill CEO Strategy (2 Years)
+            from backend.vectors.backfill import run_backfill
+            run_backfill()
             
             # 2. Seed CFO Risk Archetypes
             from backend.storage.seed_archetypes import seed_risk_archetypes
