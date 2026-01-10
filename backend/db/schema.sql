@@ -12,16 +12,17 @@ CREATE TABLE IF NOT EXISTS cfo_snapshots (
     explanation TEXT
 );
 
-CREATE TABLE IF NOT EXISTS ceo_snapshots (
+CREATE TABLE IF NOT EXISTS cto_snapshots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp TEXT NOT NULL,
-    narrative_health TEXT NOT NULL,
-    severity TEXT NOT NULL,
-    confidence REAL NOT NULL,
-    forward_looking_score REAL NOT NULL,
-    defensive_score REAL NOT NULL,
-    sentiment_trend TEXT NOT NULL,
-    explanation TEXT,
-    raw_signals TEXT -- JSON string for detailed signals
+    timestamp TEXT,
+    total_commits INTEGER,
+    commit_velocity_change_pct REAL,
+    active_contributors INTEGER,
+    consistency_score REAL,
+    release_cadence TEXT,
+    core_repo_activity TEXT,
+    execution_health TEXT,
+    severity TEXT,
+    confidence REAL,
+    explanation TEXT
 );
-

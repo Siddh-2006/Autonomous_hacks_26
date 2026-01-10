@@ -1,6 +1,6 @@
 # Product signals
 from agents.base_agent import BaseAgent
-from data_sources.product import get_product_data
+from data_sources.product import get_product_signals
 from typing import Dict, Any
 
 class CPOAgent(BaseAgent):
@@ -9,7 +9,7 @@ class CPOAgent(BaseAgent):
     
     def fetch_data(self) -> Dict[str, Any]:
         """Fetch product-related data"""
-        return get_product_data("couchbase")
+        return get_product_signals()
     
     def analyze(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze product health and user sentiment"""

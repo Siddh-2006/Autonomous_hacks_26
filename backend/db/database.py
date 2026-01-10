@@ -5,21 +5,30 @@ import json
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'cfo.db')
 
-def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
+def get_cto_db_connection():
+    conn = sqlite3.connect(CTO_DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
-    conn = get_db_connection()
+    # Initialize CFO database
+    conn = get_cfo_db_connection()
     schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
     with open(schema_path, 'r') as f:
         conn.executescript(f.read())
     conn.commit()
     conn.close()
+    
+    # Initialize CTO database
+    conn = get_cto_db_connection()
+    with open(schema_path, 'r') as f:
+        conn.executescript(f.read())
+    conn.commit()
+    conn.close()
 
-def insert_snapshot(data: dict):
-    conn = get_db_connection()
+# CFO Functions (existing)
+def insert_cfo_snapshot(data: dict):
+    conn = get_cfo_db_connection()
     conn.execute('''
         INSERT INTO cfo_snapshots (
             timestamp, open_roles, role_change_pct, 
@@ -41,8 +50,8 @@ def insert_snapshot(data: dict):
     conn.commit()
     conn.close()
 
-def get_latest_snapshot():
-    conn = get_db_connection()
+def get_latest_cfo_snapshot():
+    conn = get_cfo_db_connection()
     snapshot = conn.execute('SELECT * FROM cfo_snapshots ORDER BY timestamp DESC LIMIT 1').fetchone()
     conn.close()
     if snapshot:
@@ -98,4 +107,4 @@ def get_ceo_history(limit=5):
 # Initialize on module load or manually
 if __name__ == "__main__":
     init_db()
-    print("Database initialized.")
+    print("Databases initialized.")
