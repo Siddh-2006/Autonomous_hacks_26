@@ -3,16 +3,35 @@ import os
 from datetime import datetime
 import json
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'cfo.db')
+CFO_DB_PATH = os.path.join(os.path.dirname(__file__), 'cfo.db')
+CTO_DB_PATH = os.path.join(os.path.dirname(__file__), 'cto_agent.db')
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(CFO_DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_cfo_db_connection():
+    conn = sqlite3.connect(CFO_DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_cto_db_connection():
+    conn = sqlite3.connect(CTO_DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
-    conn = get_db_connection()
+    # Initialize CFO database
+    conn = get_cfo_db_connection()
     schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
+    with open(schema_path, 'r') as f:
+        conn.executescript(f.read())
+    conn.commit()
+    conn.close()
+    
+    # Initialize CTO database
+    conn = get_cto_db_connection()
     with open(schema_path, 'r') as f:
         conn.executescript(f.read())
     conn.commit()
@@ -99,22 +118,25 @@ def get_ceo_history(limit=5):
 
 # --- CTO Functions ---
 def insert_cto_snapshot(data):
-    conn = get_db_connection()
+    conn = get_cto_db_connection()
     c = conn.cursor()
     c.execute('''
         INSERT INTO cto_snapshots (
             timestamp, total_commits, commit_velocity_change_pct, 
             active_contributors, consistency_score, release_cadence, 
-            core_repo_activity, execution_health, severity, confidence, explanation
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            core_repo_activity, bus_factor_risk, composite_health_score,
+            execution_health, severity, confidence, explanation
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data.get('timestamp', datetime.now().isoformat()),
-        data.get('total_commits', 0),
-        data.get('commit_velocity_change_pct', 0.0),
-        data.get('active_contributors', 0),
-        data.get('consistency_score', 0.0),
-        data.get('release_cadence', 'Unknown'),
-        data.get('core_repo_activity', 'Unknown'),
+        data.get('signals', {}).get('commit_velocity_change_pct', 0) * 2,  # Rough total commits approximation
+        data.get('signals', {}).get('commit_velocity_change_pct', 0.0),
+        data.get('signals', {}).get('active_contributors', 0),
+        data.get('signals', {}).get('consistency_score', 0.0),
+        data.get('signals', {}).get('release_cadence', 'unknown'),
+        data.get('signals', {}).get('core_repo_activity', 'unknown'),
+        data.get('signals', {}).get('bus_factor_risk', 'unknown'),
+        data.get('signals', {}).get('composite_health_score', 0.0),
         data.get('execution_health', 'Stable'),
         data.get('severity', 'Low'),
         data.get('confidence', 0.0),
@@ -124,7 +146,7 @@ def insert_cto_snapshot(data):
     conn.close()
 
 def get_latest_cto_snapshot():
-    conn = get_db_connection()
+    conn = get_cto_db_connection()
     c = conn.cursor()
     c.execute('SELECT * FROM cto_snapshots ORDER BY timestamp DESC LIMIT 1')
     row = c.fetchone()
@@ -133,8 +155,16 @@ def get_latest_cto_snapshot():
         return dict(row)
     return None
 
+def get_all_cto_snapshots():
+    conn = get_cto_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM cto_snapshots ORDER BY timestamp ASC')
+    rows = c.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
 def get_cto_history(limit=5):
-    conn = get_db_connection()
+    conn = get_cto_db_connection()
     c = conn.cursor()
     c.execute('SELECT * FROM cto_snapshots ORDER BY timestamp DESC LIMIT ?', (limit,))
     rows = c.fetchall()

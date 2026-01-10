@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS cto_snapshots (
     consistency_score REAL,
     release_cadence TEXT,
     core_repo_activity TEXT,
+    bus_factor_risk TEXT,
+    composite_health_score REAL,
     execution_health TEXT,
     severity TEXT,
     confidence REAL,
