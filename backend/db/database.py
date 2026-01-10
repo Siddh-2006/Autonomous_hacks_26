@@ -5,30 +5,22 @@ import json
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'cfo.db')
 
-def get_cto_db_connection():
-    conn = sqlite3.connect(CTO_DB_PATH)
+def get_db_connection():
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
-    # Initialize CFO database
-    conn = get_cfo_db_connection()
+    conn = get_db_connection()
     schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
     with open(schema_path, 'r') as f:
         conn.executescript(f.read())
     conn.commit()
     conn.close()
-    
-    # Initialize CTO database
-    conn = get_cto_db_connection()
-    with open(schema_path, 'r') as f:
-        conn.executescript(f.read())
-    conn.commit()
-    conn.close()
 
-# CFO Functions (existing)
+# --- CFO Functions ---
 def insert_cfo_snapshot(data: dict):
-    conn = get_cfo_db_connection()
+    conn = get_db_connection()
     conn.execute('''
         INSERT INTO cfo_snapshots (
             timestamp, open_roles, role_change_pct, 
@@ -51,14 +43,14 @@ def insert_cfo_snapshot(data: dict):
     conn.close()
 
 def get_latest_cfo_snapshot():
-    conn = get_cfo_db_connection()
+    conn = get_db_connection()
     snapshot = conn.execute('SELECT * FROM cfo_snapshots ORDER BY timestamp DESC LIMIT 1').fetchone()
     conn.close()
     if snapshot:
         return dict(snapshot)
     return None
 
-def get_all_snapshots():
+def get_all_snapshots(): # Legacy/General
     conn = get_db_connection()
     c = conn.cursor()
     c.execute('SELECT * FROM cfo_snapshots ORDER BY timestamp DESC')
@@ -66,6 +58,7 @@ def get_all_snapshots():
     conn.close()
     return [dict(row) for row in rows]
 
+# --- CEO Functions ---
 def insert_ceo_snapshot(data):
     conn = get_db_connection()
     c = conn.cursor()
@@ -104,7 +97,50 @@ def get_ceo_history(limit=5):
     conn.close()
     return [dict(row) for row in rows]
 
-# Initialize on module load or manually
+# --- CTO Functions ---
+def insert_cto_snapshot(data):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO cto_snapshots (
+            timestamp, total_commits, commit_velocity_change_pct, 
+            active_contributors, consistency_score, release_cadence, 
+            core_repo_activity, execution_health, severity, confidence, explanation
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        data.get('timestamp', datetime.now().isoformat()),
+        data.get('total_commits', 0),
+        data.get('commit_velocity_change_pct', 0.0),
+        data.get('active_contributors', 0),
+        data.get('consistency_score', 0.0),
+        data.get('release_cadence', 'Unknown'),
+        data.get('core_repo_activity', 'Unknown'),
+        data.get('execution_health', 'Stable'),
+        data.get('severity', 'Low'),
+        data.get('confidence', 0.0),
+        data.get('explanation', '')
+    ))
+    conn.commit()
+    conn.close()
+
+def get_latest_cto_snapshot():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM cto_snapshots ORDER BY timestamp DESC LIMIT 1')
+    row = c.fetchone()
+    conn.close()
+    if row:
+        return dict(row)
+    return None
+
+def get_cto_history(limit=5):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM cto_snapshots ORDER BY timestamp DESC LIMIT ?', (limit,))
+    rows = c.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
 if __name__ == "__main__":
     init_db()
-    print("Databases initialized.")
+    print("Database initialized.")

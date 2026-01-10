@@ -6,10 +6,10 @@ import os
 sys.path.append("d:/Autonomous _hacks/auto-diligence")
 
 try:
-    print("Attempting to import CFOAgent...")
-    from backend.agents.cfo.agent import CFOAgent
+    print("Attempting to import ExecutiveReasoningAgent...")
+    from backend.agents.executive_reasoning_agent import ExecutiveReasoningAgent
     print("Import successful. Initializing...")
-    agent = CFOAgent()
+    agent = ExecutiveReasoningAgent()
     print("Analyzing...")
     result = agent.analyze()
     print(result)
