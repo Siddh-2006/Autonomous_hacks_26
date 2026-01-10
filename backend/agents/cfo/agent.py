@@ -9,7 +9,7 @@ from backend.agents.base_agent import BaseAgent
 from backend.data_sources.careers_scraper import fetch_open_roles, fetch_latest_press_release
 from backend.data_sources.role_classifier import classify_roles, analyze_seniority
 from backend.data_sources.linguistic_analyzer import LinguisticAnalyzer
-from backend.db.database import get_latest_snapshot, insert_snapshot
+from backend.db.database import get_latest_cfo_snapshot as get_latest_snapshot, insert_cfo_snapshot as insert_snapshot
 
 class CFOAgent(BaseAgent):
     def __init__(self):

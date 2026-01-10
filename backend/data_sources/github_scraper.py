@@ -14,6 +14,14 @@ def fetch_github_metrics(org_name="couchbase"):
     
     # We use unauthenticated requests for public data. 
     # Rate limit is 60/hr. If hit, we return safe defaults.
+    # UPGRADE: Check for GITHUB_TOKEN in env for higher rate limits (5000/hr).
+    import os
+    token = os.getenv("GITHUB_TOKEN")
+    headers = {}
+    if token:
+        headers["Authorization"] = f"token {token}"
+        print("[INFO] Using GitHub Token for increased rate limits.")
+
     
     metrics = {
         "total_commits_last_30d": 0,
@@ -26,7 +34,7 @@ def fetch_github_metrics(org_name="couchbase"):
     
     try:
         # 1. Fetch Repos (Top 30 recently updated)
-        resp = requests.get(base_url, timeout=10)
+        resp = requests.get(base_url, headers=headers, timeout=10)
         if resp.status_code != 200:
             print(f"[WARNING] GitHub API Error: {resp.status_code}")
             return metrics
@@ -52,7 +60,7 @@ def fetch_github_metrics(org_name="couchbase"):
             
             # Fetch Commits
             commits_url = f"https://api.github.com/repos/{org_name}/{repo_name}/commits?since={sixty_days_ago.isoformat()}"
-            commits_resp = requests.get(commits_url, timeout=5)
+            commits_resp = requests.get(commits_url, headers=headers, timeout=5)
             
             if commits_resp.status_code == 200:
                 commits = commits_resp.json()
