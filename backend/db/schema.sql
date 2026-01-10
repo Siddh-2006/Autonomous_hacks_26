@@ -11,3 +11,18 @@ CREATE TABLE IF NOT EXISTS cfo_snapshots (
     confidence REAL,
     explanation TEXT
 );
+
+CREATE TABLE IF NOT EXISTS cto_snapshots (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT,
+    total_commits INTEGER,
+    commit_velocity_change_pct REAL,
+    active_contributors INTEGER,
+    consistency_score REAL,
+    release_cadence TEXT,
+    core_repo_activity TEXT,
+    execution_health TEXT,
+    severity TEXT,
+    confidence REAL,
+    explanation TEXT
+);
