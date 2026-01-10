@@ -37,32 +37,42 @@ def startup():
     
     # --- AUTO-DEPLOYMENT: VECTOR DB ---
     # Check if we need to hydrate the "Brain" (First run on Cloud)
-    from backend.storage.vector_db import vector_memory
-    try:
-        count = vector_memory.collection.count()
-        print(f"[STARTUP] Vector Memory Count: {count}")
-        if count < 5:
-            print("[STARTUP] Fresh deployment detected. Auto-seeding Vector DB...")
-            # 1. Backfill CEO Strategy (2 Years)
-            # 1. Backfill CEO Strategy (2 Years)
-            from backend.vectors.backfill import run_backfill
-            run_backfill()
-            
-            # 2. Seed CFO Risk Archetypes
-            from backend.storage.seed_archetypes import seed_risk_archetypes
-            seed_risk_archetypes()
-            
-            # 3. Seed SQLite History (Timeline)
-            from backend.db.seed_history import seed_executive_history
-            seed_executive_history()
-            
-            print("[STARTUP] Seeding Complete. System is ready.")
-    except Exception as e:
-        print(f"[STARTUP] Warning: Vector DB check failed: {e}")
+    # --- AUTO-DEPLOYMENT: BACKGROUND SEEDING ---
+    # We move this to a background thread so the API boots INSTANTLY.
+    # Otherwise, Railway might time out (502 Error) waiting for the backfill to finish.
+    def seed_data_background():
+        import time
+        time.sleep(2) # Give boot a moment
+        from backend.storage.vector_db import vector_memory
+        try:
+            count = vector_memory.collection.count()
+            print(f"[STARTUP] Vector Memory Count: {count}")
+            if count < 5:
+                print("[STARTUP] Fresh deployment detected. Auto-seeding Vector DB...")
+                
+                # 1. Backfill CEO Strategy (2 Years)
+                from backend.vectors.backfill import run_backfill
+                run_backfill()
+                
+                # 2. Seed CFO Risk Archetypes
+                from backend.storage.seed_archetypes import seed_risk_archetypes
+                seed_risk_archetypes()
+                
+                # 3. Seed SQLite History (Timeline)
+                from backend.db.seed_history import seed_executive_history
+                seed_executive_history()
+                
+                print("[STARTUP] Seeding Complete. System is ready.")
+        except Exception as e:
+            print(f"[STARTUP] Warning: Vector DB check failed: {e}")
+
+    import threading
+    seed_thread = threading.Thread(target=seed_data_background, daemon=True)
+    seed_thread.start()
 
     # --- AUTO-DEPLOYMENT: SCHEDULER (The Heartbeat) ---
     # Start the 6-hour loop in a background thread so it runs alongside the API
-    import threading
+    
     from backend.scheduler.run_agents import run_pipeline
     import schedule
     import time
