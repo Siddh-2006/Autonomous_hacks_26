@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Diligence | Executive Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0B0F1A; color: #E2E8F0; font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+        .status-pill {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-low { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+        .status-medium { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid #eab308; }
+        .status-high { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        
+        .agent-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="p-8 min-h-screen">
+
+    <div class="max-w-6xl mx-auto space-y-8">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Auto-Diligence</h1>
+                <p class="text-slate-400 text-sm">Autonomous Executive Intelligence System</p>
+            </div>
+            <button onclick="refreshData()" id="refreshBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2">
+                <span>🔄 Refresh Intelligence</span>
+            </button>
+        </header>
+
+        <!-- Hero: Board Verdict -->
+        <section class="glass-panel p-8 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+            
+            <h2 class="text-xs font-bold text-slate-400 tracking-widest uppercase mb-2">Executive Board Verdict</h2>
+            <div class="flex items-center gap-6">
+                <div id="verdict-badgev" class="text-5xl font-bold text-white tracking-tight">LOADING...</div>
+                <div class="h-12 w-px bg-white/10"></div>
+                <div>
+                    <p id="verdict-reason" class="text-lg text-slate-300 max-w-2xl leading-relaxed">
+                        Establishing connection to agent network...
+                    </p>
+                    <p id="verdict-confidence" class="text-xs text-slate-500 mt-2 font-mono">CONFIDENCE: --%</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agents Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- CFO Card -->
+            <div class="glass-panel p-6 border-t-4 border-emerald-500">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="agent-icon">👮</div>
+                    <span id="cfo-status" class="status-pill status-high">Offline</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-1">CFO Agent</h3>
+                <p class="text-xs text-slate-400 uppercase tracking-wide mb-4">Financial & Hiring Forensics</p>
+                
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400">Financial Mode</span>
+                        <span id="cfo-mode" class="font-mono text-white">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400">Open Roles</span>
+                        <span id="cfo-roles" class="font-mono text-white">--</span>
+                    </div>
+                    <p id="cfo-summary" class="text-slate-400 italic text-xs mt-4 line-clamp-3">--</p>
+                </div>
+            </div>
+
+            <!-- CEO Card -->
+            <div class="glass-panel p-6 border-t-4 border-blue-500">
+                 <div class="flex justify-between items-start mb-4">
+                    <div class="agent-icon">🧠</div>
+                    <span id="ceo-status" class="status-pill status-high">Offline</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-1">CEO Agent</h3>
+                <p class="text-xs text-slate-400 uppercase tracking-wide mb-4">Strategy & Narrative Analysis</p>
+                
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400">Narrative Health</span>
+                        <span id="ceo-health" class="font-mono text-white">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400">Strategy Score</span>
+                        <span id="ceo-score" class="font-mono text-white">--</span>
+                    </div>
+                    <p id="ceo-summary" class="text-slate-400 italic text-xs mt-4 line-clamp-3">--</p>
+                </div>
+            </div>
+
+            <!-- CTO Card -->
+            <div class="glass-panel p-6 border-t-4 border-purple-500">
+                 <div class="flex justify-between items-start mb-4">
+                    <div class="agent-icon">🛠️</div>
+                    <span id="cto-status" class="status-pill status-high">Offline</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-1">CTO Agent</h3>
+                <p class="text-xs text-slate-400 uppercase tracking-wide mb-4">Technical Execution Audit</p>
+                
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400">Execution</span>
+                        <span id="cto-health" class="font-mono text-white">--</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400">Commits (30d)</span>
+                        <span id="cto-commits" class="font-mono text-white">--</span>
+                    </div>
+                    <p id="cto-summary" class="text-slate-400 italic text-xs mt-4 line-clamp-3">--</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8000/api";
+
+        async function fetchData() {
+            try {
+                const res = await fetch(`${API_URL}/board/status`);
+                const data = await res.json();
+                render(data);
+            } catch (e) {
+                console.error("Fetch failed", e);
+            }
+        }
+
+        async function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.innerHTML = '<span class="animate-spin">🔄</span> Running Agents...';
+            btn.disabled = true;
+            try {
+                const res = await fetch(`${API_URL}/board/refresh`, { method: 'POST' });
+                const data = await res.json();
+                await fetchData(); // Reload
+            } catch (e) {
+                alert("Agents failed to run. Check console.");
+            }
+            btn.innerHTML = '<span>🔄 Refresh Intelligence</span>';
+            btn.disabled = false;
+        }
+
+        function render(data) {
+            // Board
+            const v = data.verdict;
+            const riskEl = document.getElementById('verdict-badgev');
+            riskEl.innerText = v.overall_risk.toUpperCase();
+            riskEl.className = `text-5xl font-bold tracking-tight ${getColor(v.overall_risk)}`;
+            
+            document.getElementById('verdict-reason').innerText = v.reason;
+            document.getElementById('verdict-confidence').innerText = `CONFIDENCE: ${(v.confidence * 100).toFixed(0)}%`;
+
+            // CFO
+            const cfo = data.agents.cfo || {};
+            setField('cfo-status', cfo.severity, true);
+            setText('cfo-mode', cfo.financial_mode);
+            setText('cfo-roles', cfo.open_roles);
+            setText('cfo-summary', cfo.explanation);
+
+            // CEO
+            const ceo = data.agents.ceo || {};
+            setField('ceo-status', ceo.severity, true);
+            setText('ceo-health', ceo.narrative_health);
+            setText('ceo-score', `${(ceo.forward_looking_score || 0).toFixed(1)} / ${(ceo.defensive_score || 0).toFixed(1)}`);
+            setText('ceo-summary', ceo.explanation);
+
+            // CTO
+            const cto = data.agents.cto || {};
+            setField('cto-status', cto.severity, true);
+            setText('cto-health', cto.execution_health);
+            setText('cto-commits', cto.total_commits);
+            setText('cto-summary', cto.explanation);
+        }
+
+        function getColor(risk) {
+            if (risk === 'Low') return 'text-green-400';
+            if (risk === 'Medium') return 'text-yellow-400';
+            return 'text-red-400';
+        }
+
+        function setField(id, val, isBadge=false) {
+            const el = document.getElementById(id);
+            if (!val) {
+                el.innerText = 'N/A';
+                return;
+            }
+            el.innerText = val.toUpperCase();
+            if (isBadge) {
+                el.className = `status-pill ${val === 'Low' ? 'status-low' : val === 'Medium' ? 'status-medium' : 'status-high'}`;
+            }
+        }
+        
+        function setText(id, val) {
+            document.getElementById(id).innerText = val !== undefined ? val : '--';
+        }
+
+        // Init
+        fetchData();
+    </script>
+</body>
+</html>

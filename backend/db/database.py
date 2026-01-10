@@ -171,6 +171,19 @@ def get_cto_history(limit=5):
     conn.close()
     return [dict(row) for row in rows]
 
+def get_executive_history(limit=5):
+    conn = get_db_connection()
+    c = conn.cursor()
+    try:
+        # Check if table exists first (handling legacy dbs)
+        c.execute('SELECT * FROM executive_snapshots ORDER BY timestamp DESC LIMIT ?', (limit,))
+        rows = c.fetchall()
+        return [dict(row) for row in rows]
+    except sqlite3.OperationalError:
+        return []
+    finally:
+        conn.close()
+
 if __name__ == "__main__":
     init_db()
     print("Database initialized.")

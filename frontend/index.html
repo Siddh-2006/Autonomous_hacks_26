@@ -1,223 +1,607 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto-Diligence | Executive Board</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto-Diligence | Autonomous Investor System</title>
     <style>
-        body { background-color: #0B0F1A; color: #E2E8F0; font-family: 'Inter', sans-serif; }
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
+        :root {
+            --bg: #0b0f14;
+            --panel: #121824;
+            --panel-2: #0f1420;
+            --card-hover: #1a2234;
+            --accent: #5eead4;
+            --danger: #fb7185;
+            --warning: #facc15;
+            --success: #22c55e;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --border: #1f2937;
         }
-        .status-pill {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(1200px 600px at 20% -10%, #111827, transparent), var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, #0c111b, #0a0e17);
+            border-right: 1px solid var(--border);
+            padding: 24px 18px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            background: rgba(94, 234, 212, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .nav {
+            flex: 1;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--muted);
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text);
+        }
+
+        .nav a.active {
+            background: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Main */
+        .main {
+            padding: 32px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 99px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: linear-gradient(180deg, var(--panel), var(--panel-2));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            opacity: 0.5;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(94, 234, 212, 0.2);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .thesis-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .risk-score {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.03em;
+        }
+
+        .risk-label {
+            font-size: 14px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .signal-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .signal {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .signal:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .signal-agent {
+            font-weight: 600;
+            color: var(--accent);
+            margin-right: 12px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .timeline .event {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .event:last-child {
+            border-bottom: none;
+        }
+
+        .event-time {
+            font-size: 12px;
+            color: var(--muted);
+            min-width: 80px;
+        }
+
+        .event-body {
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
         }
-        .status-low { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
-        .status-medium { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid #eab308; }
-        .status-high { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-        
-        .agent-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+
+        .tag.red {
+            background: rgba(251, 113, 133, 0.15);
+            color: var(--danger);
+        }
+
+        .tag.green {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+        }
+
+        .tag.yellow {
+            background: rgba(250, 204, 21, 0.15);
+            color: var(--warning);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            color: var(--muted);
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        .log-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--muted);
         }
     </style>
 </head>
-<body class="p-8 min-h-screen">
 
-    <div class="max-w-6xl mx-auto space-y-8">
-        
-        <!-- Header -->
-        <header class="flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Auto-Diligence</h1>
-                <p class="text-slate-400 text-sm">Autonomous Executive Intelligence System</p>
-            </div>
-            <button onclick="refreshData()" id="refreshBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2">
-                <span>🔄 Refresh Intelligence</span>
-            </button>
-        </header>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="logo">Auto-Diligence <span>v2.0</span></div>
+            <nav class="nav">
+                <a class="active" onclick="showPage('overview')">Overview</a>
+                <a onclick="showPage('signals')">Signals</a>
+                <a onclick="showPage('risk')">Risk Engine</a>
+                <a onclick="showPage('thesis')">Thesis History</a>
+                <a onclick="showPage('agents')">Agent Logs</a>
+            </nav>
+        </aside>
 
-        <!-- Hero: Board Verdict -->
-        <section class="glass-panel p-8 relative overflow-hidden group">
-            <div class="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-            
-            <h2 class="text-xs font-bold text-slate-400 tracking-widest uppercase mb-2">Executive Board Verdict</h2>
-            <div class="flex items-center gap-6">
-                <div id="verdict-badgev" class="text-5xl font-bold text-white tracking-tight">LOADING...</div>
-                <div class="h-12 w-px bg-white/10"></div>
-                <div>
-                    <p id="verdict-reason" class="text-lg text-slate-300 max-w-2xl leading-relaxed">
-                        Establishing connection to agent network...
-                    </p>
-                    <p id="verdict-confidence" class="text-xs text-slate-500 mt-2 font-mono">CONFIDENCE: --%</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Agents Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <!-- CFO Card -->
-            <div class="glass-panel p-6 border-t-4 border-emerald-500">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="agent-icon">👮</div>
-                    <span id="cfo-status" class="status-pill status-high">Offline</span>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-1">CFO Agent</h3>
-                <p class="text-xs text-slate-400 uppercase tracking-wide mb-4">Financial & Hiring Forensics</p>
-                
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-400">Financial Mode</span>
-                        <span id="cfo-mode" class="font-mono text-white">--</span>
-                    </div>
-                    <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-400">Open Roles</span>
-                        <span id="cfo-roles" class="font-mono text-white">--</span>
-                    </div>
-                    <p id="cfo-summary" class="text-slate-400 italic text-xs mt-4 line-clamp-3">--</p>
+        <main class="main">
+            <div class="header">
+                <h1>Investment Intelligence</h1>
+                <div class="status-badge">
+                    <div class="status-dot"></div> Live Monitoring
                 </div>
             </div>
 
-            <!-- CEO Card -->
-            <div class="glass-panel p-6 border-t-4 border-blue-500">
-                 <div class="flex justify-between items-start mb-4">
-                    <div class="agent-icon">🧠</div>
-                    <span id="ceo-status" class="status-pill status-high">Offline</span>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-1">CEO Agent</h3>
-                <p class="text-xs text-slate-400 uppercase tracking-wide mb-4">Strategy & Narrative Analysis</p>
-                
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-400">Narrative Health</span>
-                        <span id="ceo-health" class="font-mono text-white">--</span>
+            <!-- OVERVIEW -->
+            <section id="overview" class="page active">
+                <div class="grid">
+                    <!-- Live Thesis -->
+                    <div class="card" style="grid-column:span 8">
+                        <h3>Live Investment Thesis (Generated by AI)</h3>
+                        <div id="live-thesis" class="thesis-text">Loading thesis...</div>
                     </div>
-                    <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-400">Strategy Score</span>
-                        <span id="ceo-score" class="font-mono text-white">--</span>
-                    </div>
-                    <p id="ceo-summary" class="text-slate-400 italic text-xs mt-4 line-clamp-3">--</p>
-                </div>
-            </div>
 
-            <!-- CTO Card -->
-            <div class="glass-panel p-6 border-t-4 border-purple-500">
-                 <div class="flex justify-between items-start mb-4">
-                    <div class="agent-icon">🛠️</div>
-                    <span id="cto-status" class="status-pill status-high">Offline</span>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-1">CTO Agent</h3>
-                <p class="text-xs text-slate-400 uppercase tracking-wide mb-4">Technical Execution Audit</p>
-                
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-400">Execution</span>
-                        <span id="cto-health" class="font-mono text-white">--</span>
+                    <!-- Overall Risk -->
+                    <div class="card" style="grid-column:span 4; text-align: center;">
+                        <h3>Overall Risk Level</h3>
+                        <div id="risk-score" class="risk-score">--</div>
+                        <div id="risk-label" class="risk-label">Calculating...</div>
                     </div>
-                    <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-400">Commits (30d)</span>
-                        <span id="cto-commits" class="font-mono text-white">--</span>
-                    </div>
-                    <p id="cto-summary" class="text-slate-400 italic text-xs mt-4 line-clamp-3">--</p>
-                </div>
-            </div>
 
-        </div>
+                    <!-- Key Stats Row -->
+                    <div class="card" style="grid-column:span 4">
+                        <h3>CFO Financial Mode</h3>
+                        <div id="cfo-mode" style="font-size: 24px; font-weight: 600;">--</div>
+                    </div>
+                    <div class="card" style="grid-column:span 4">
+                        <h3>CEO Strategy Drift</h3>
+                        <div id="ceo-drift" style="font-size: 24px; font-weight: 600;">--</div>
+                    </div>
+                    <div class="card" style="grid-column:span 4">
+                        <h3>CTO Velocity</h3>
+                        <div id="cto-health" style="font-size: 24px; font-weight: 600;">--</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SIGNALS -->
+            <section id="signals" class="page">
+                <div class="card">
+                    <h3>Active Agent Signals</h3>
+                    <div id="signal-container" class="signal-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- RISK ENGINE -->
+            <section id="risk" class="page">
+                <div class="card">
+                    <h3>Risk Factor Breakdown</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Driver / Evidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="risk-table">
+                            <!-- JS populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- THESIS HISTORY -->
+            <section id="thesis" class="page">
+                <div class="card">
+                    <h3>Thesis Evolution Timeline</h3>
+                    <div id="timeline-container" class="timeline">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- AGENT LOGS -->
+            <section id="agents" class="page">
+                <div class="card">
+                    <h3>Real-Time Agent Logs</h3>
+                    <div id="logs-container" style="max-height: 400px; overflow-y: auto;">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </section>
+
+            <footer>
+                Autonomous Due-Diligence System • Powered by Multi-Agent Vector Forensics
+            </footer>
+        </main>
     </div>
 
     <script>
-        const API_URL = "http://localhost:8000/api";
+        // --- UI Logic ---
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+            event.currentTarget.classList.add('active'); // Fixed target issue
+        }
+
+        // --- Data Logic (Real-Time) ---
+        const API_URL = "http://localhost:8000/api/board/status";
+        // Note: On production deploy, this URL should be updated or relative if served from same origin. 
+        // For now assuming localhost dev.
 
         async function fetchData() {
             try {
-                const res = await fetch(`${API_URL}/board/status`);
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("API Error");
                 const data = await res.json();
-                render(data);
+                updateUI(data);
             } catch (e) {
-                console.error("Fetch failed", e);
+                console.log("Polling error:", e);
             }
         }
 
-        async function refreshData() {
-            const btn = document.getElementById('refreshBtn');
-            btn.innerHTML = '<span class="animate-spin">🔄</span> Running Agents...';
-            btn.disabled = true;
-            try {
-                const res = await fetch(`${API_URL}/board/refresh`, { method: 'POST' });
-                const data = await res.json();
-                await fetchData(); // Reload
-            } catch (e) {
-                alert("Agents failed to run. Check console.");
+        function updateUI(data) {
+            const v = data.verdict || {};
+            const agents = data.agents || {};
+            const history = data.history || [];
+
+            // 1. Overview
+            document.getElementById('live-thesis').innerText = v.reason || "No thesis generated yet.";
+
+            const risk = v.overall_risk || "Unknown";
+            const elRisk = document.getElementById('risk-score');
+            elRisk.innerText = risk.toUpperCase();
+
+            // Color coding
+            if (risk === 'Critical' || risk === 'High') { elRisk.style.color = 'var(--danger)'; }
+            else if (risk === 'Medium') { elRisk.style.color = 'var(--warning)'; }
+            else { elRisk.style.color = 'var(--success)'; }
+
+            document.getElementById('risk-label').innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}%`;
+
+            // Agent Stats
+            document.getElementById('cfo-mode').innerText = agents.cfo ? agents.cfo.financial_mode : "N/A";
+            document.getElementById('ceo-drift').innerText = agents.ceo ? agents.ceo.health : "N/A";
+            document.getElementById('cto-health').innerText = agents.cto ? agents.cto.execution_health : "N/A";
+
+            // 2. Signals list
+            const signalsDiv = document.getElementById('signal-container');
+            signalsDiv.innerHTML = '';
+
+            const signalList = [
+                { name: 'CFO Agent', msg: agents.cfo ? agents.cfo.explanation : "No data" },
+                { name: 'CEO Agent', msg: agents.ceo ? agents.ceo.explanation : "No data" },
+                { name: 'CTO Agent', msg: agents.cto ? agents.cto.explanation : "No data" }
+            ];
+
+            signalList.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'signal';
+                div.innerHTML = `<span class="signal-agent">${s.name}</span> <span>${s.msg}</span>`;
+                signalsDiv.appendChild(div);
+            });
+
+            // 3. Risk Table
+            const riskTable = document.getElementById('risk-table');
+            riskTable.innerHTML = `
+        <tr>
+            <td>Execution</td>
+            <td style="color:${agents.cto?.execution_health === 'Declining' ? 'var(--danger)' : 'var(--success)'}">${agents.cto?.execution_health}</td>
+            <td>CTO Repo Activity</td>
+        </tr>
+        <tr>
+            <td>Financial</td>
+            <td style="color:${agents.cfo?.financial_mode === 'Distress' ? 'var(--danger)' : 'var(--success)'}">${agents.cfo?.financial_mode}</td>
+            <td>Hiring & Spend Tones</td>
+        </tr>
+        <tr>
+            <td>Narrative</td>
+            <td style="color:${agents.ceo?.health === 'Critical' ? 'var(--danger)' : 'var(--success)'}">${agents.ceo?.health}</td>
+            <td>Strategy Drift / Contradiction</td>
+        </tr>
+    `;
+
+            // 4. Timeline
+            const timelineDiv = document.getElementById('timeline-container');
+            timelineDiv.innerHTML = '';
+            if (history.length === 0) {
+                timelineDiv.innerHTML = '<div class="event">No history recorded yet.</div>';
+            } else {
+                history.forEach(h => {
+                    const div = document.createElement('div');
+                    div.className = 'event';
+                    const riskColor = h.overall_risk === 'High' ? 'red' : (h.overall_risk === 'Medium' ? 'yellow' : 'green');
+                    div.innerHTML = `
+                <div class="event-time">${new Date(h.timestamp).toLocaleDateString()}</div>
+                <div class="event-body">${h.reason}</div>
+                <span class="tag ${riskColor}">${h.overall_risk}</span>
+            `;
+                    timelineDiv.appendChild(div);
+                });
             }
-            btn.innerHTML = '<span>🔄 Refresh Intelligence</span>';
-            btn.disabled = false;
+
+            // 5. Logs (Simulated from signals)
+            const logsDiv = document.getElementById('logs-container');
+            logsDiv.innerHTML = '';
+            // Just showing timestamps of last updates
+            const updates = [
+                { src: 'SYSTEM', msg: `Board analysis complete. Risk: ${risk}` },
+                { src: 'CFO', msg: `Processed job items. Verdict: ${agents.cfo?.financial_mode}` },
+                { src: 'CEO', msg: `News scan complete. Narrative: ${agents.ceo?.health}` }
+            ];
+            updates.forEach(u => {
+                const d = document.createElement('div');
+                d.className = 'log-entry';
+                d.innerText = `[${new Date().toLocaleTimeString()}] [${u.src}] ${u.msg}`;
+                logsDiv.appendChild(d);
+            });
         }
 
-        function render(data) {
-            // Board
-            const v = data.verdict;
-            const riskEl = document.getElementById('verdict-badgev');
-            riskEl.innerText = v.overall_risk.toUpperCase();
-            riskEl.className = `text-5xl font-bold tracking-tight ${getColor(v.overall_risk)}`;
-            
-            document.getElementById('verdict-reason').innerText = v.reason;
-            document.getElementById('verdict-confidence').innerText = `CONFIDENCE: ${(v.confidence * 100).toFixed(0)}%`;
-
-            // CFO
-            const cfo = data.agents.cfo || {};
-            setField('cfo-status', cfo.severity, true);
-            setText('cfo-mode', cfo.financial_mode);
-            setText('cfo-roles', cfo.open_roles);
-            setText('cfo-summary', cfo.explanation);
-
-            // CEO
-            const ceo = data.agents.ceo || {};
-            setField('ceo-status', ceo.severity, true);
-            setText('ceo-health', ceo.narrative_health);
-            setText('ceo-score', `${(ceo.forward_looking_score || 0).toFixed(1)} / ${(ceo.defensive_score || 0).toFixed(1)}`);
-            setText('ceo-summary', ceo.explanation);
-
-            // CTO
-            const cto = data.agents.cto || {};
-            setField('cto-status', cto.severity, true);
-            setText('cto-health', cto.execution_health);
-            setText('cto-commits', cto.total_commits);
-            setText('cto-summary', cto.explanation);
-        }
-
-        function getColor(risk) {
-            if (risk === 'Low') return 'text-green-400';
-            if (risk === 'Medium') return 'text-yellow-400';
-            return 'text-red-400';
-        }
-
-        function setField(id, val, isBadge=false) {
-            const el = document.getElementById(id);
-            if (!val) {
-                el.innerText = 'N/A';
-                return;
-            }
-            el.innerText = val.toUpperCase();
-            if (isBadge) {
-                el.className = `status-pill ${val === 'Low' ? 'status-low' : val === 'Medium' ? 'status-medium' : 'status-high'}`;
-            }
-        }
-        
-        function setText(id, val) {
-            document.getElementById(id).innerText = val !== undefined ? val : '--';
-        }
-
-        // Init
+        // Initial Load & Polling (Real-Time)
         fetchData();
+        setInterval(fetchData, 5000); // 5 seconds poll
+
     </script>
 </body>
+
 </html>

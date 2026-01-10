@@ -38,8 +38,13 @@ def get_board_status():
     evaluator = ExecutiveEvaluator()
     verdict = evaluator.evaluate_current_state()
     
+    # Fetch history for "Thesis Evolution"
+    from backend.db.database import get_executive_history
+    history = get_executive_history(limit=5)
+    
     return {
         "verdict": verdict,
+        "history": history,
         "agents": {
             "cfo": get_latest_cfo_snapshot(),
             "ceo": get_latest_ceo_snapshot(),
