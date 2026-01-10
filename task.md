@@ -1,0 +1,63 @@
+# Tasks
+- [x] Create directory structure for Executive Diligence System based on architectural requirements
+- [x] Implement CFO Agent 3-Tier Architecture
+    - [x] Reorganize project structure (move agents, core, data_sources to `backend/`)
+    - [x] Create `backend/db` directory and implement `schema.sql` (Tier 3)
+    - [x] Implement `database.py` for SQLite access (Tier 3)
+    - [x] Implement `careers_scraper.py` and `role_classifier.py` (Tier 1)
+    - [x] Implement `cfo_agent.py` logic (Tier 2)
+    - [x] Create `cfo_snapshots` table
+- [x] Verify System Functionality
+    - [x] Run `cfo_agent.py` and check output
+    - [x] Verify database inclusion
+- [x] Upgrade to "Real CFO" (Forensic Auditor)
+    - [x] Implement `linguistic_analyzer.py` (Deception/Hedging detection)
+    - [x] Update `role_classifier.py` (Seniority Analysis)
+    - [x] Refactor `cfo_agent.py` with Audit Logic (Narrative Disconnect)
+    - [x] Implement `CFO_MEMO` generation
+- [x] Finalize with Real Data & Documentation
+    - [x] Research scrape targets (Couchbase Careers/IR)
+    - [x] Implement REAL `fetch_open_roles` in `careers_scraper.py` (with Fallback)
+    - [x] Implement REAL text fetch in `linguistic_analyzer.py`
+    - [x] Create `CFO_AGENT_MASTER_GUIDE.md`
+    - [x] Create `test_end_to_end_real.py`
+- [x] **Implement CEO Agent (Narrative & Strategy)**
+    - [x] **Tier 3 (Storage)**: Update `schema.sql` with `ceo_snapshots` table
+    - [x] **Tier 3 (Storage)**: Update `database.py` to handle CEO snapshots
+    - [x] **Tier 1 (Data)**: Create `news_scraper.py` (Google News RSS / Real Snapshot protection)
+    - [x] **Tier 1 (Data)**: Create `strategy_analyzer.py` (Tone/consistency extractor)
+    - [x] **Tier 2 (Intelligence)**: Create `backend/agents/ceo/agent.py` (Decision logic, Time-based reasoning)
+    - [x] **Verification**: Create `test_ceo_agent.py` and verify end-to-end
+- [x] **Project Documentation & Polish**
+    - [x] Create interactive `README.md` with Mermaid Architecture
+    - [x] Push final documentation to GitHub
+- [/] **Implement Cross-Agent Executive Reasoning System**
+    - [ ] **CTO Agent (Tech Health)**
+        - [ ] Tier 1: `backend/data_sources/github_scraper.py` (GitHub API)
+        - [ ] Tier 2: `backend/agents/cto/agent.py` (Innovation logic)
+        - [ ] Tier 3: Verify `cto_snapshots` in DB (User added)
+    - [ ] **Reasoning Layer (The Board)**
+        - [ ] Create `backend/reasoning/rules.py` (Deterministic Logic)
+        - [ ] Create `backend/reasoning/evaluator.py` (Rule Engine)
+        - [ ] Create `backend/agents/executive_reasoning_agent.py` (Orchestrator)
+        - [ ] Tier 3: Add `executive_snapshots` table to DB
+    - [ ] **API & Dashboard Support**
+        - [ ] Create `backend/api/routes.py` (FastAPI/Flask?)
+    - [ ] **Verification**
+        - [ ] Create `test_full_system.py`
+    - [x] **Core System Verification**
+    - [x] Verify CFO Agent (Live Greenhouse API)
+    - [x] Verify CEO Agent (Live Google News)
+    - [x] Verify CTO Agent (Live GitHub API)
+    - [x] Verify Board Logic (Deterministic Rules)
+- [ ] **Phase 2: "Deep Memory" & Forensics**
+    - [x] Implement Vector Database (ChromaDB)
+    - [x] Implement Forensic "Risk Archetypes" (CFO)
+    - [x] Implement Historical Backfill (SEC/Archive)
+    - [x] Implement CEO "Contradiction Detection"
+    - [x] Verify End-to-End Vector Pipeline
+- [ ] **Deployment Prep**
+    - [x] Create `requirements.txt`
+    - [x] Create `Procfile`
+    - [x] Create `build.sh`
+    - [x] Final Smoke Test (Scheduler)

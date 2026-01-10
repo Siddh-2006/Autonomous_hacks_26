@@ -10,6 +10,8 @@ from backend.data_sources.careers_scraper import fetch_open_roles, fetch_latest_
 from backend.data_sources.role_classifier import classify_roles, analyze_seniority
 from backend.data_sources.linguistic_analyzer import LinguisticAnalyzer
 from backend.db.database import get_latest_cfo_snapshot as get_latest_snapshot, insert_cfo_snapshot as insert_snapshot
+from backend.storage.vector_db import vector_memory
+from backend.data_sources.earnings_mock import fetch_latest_earnings_call
 
 class CFOAgent(BaseAgent):
     def __init__(self):
@@ -74,6 +76,36 @@ class CFOAgent(BaseAgent):
             else:
                 explanation = "Operations appear consistent with statements."
 
+        # 🚨 FORENSIC LOGIC II: Earnings Call Evasion Check
+        # Generate a baseline "Evasion Score"
+        earnings_data = fetch_latest_earnings_call()
+        evasion_count = 0
+        evasion_details = []
+        
+        for qa in earnings_data['qa_pairs']:
+            # We treat Question similarity to Answer. 
+            # If Q and A are discussing different topics (low similarity), it's evasion.
+            # Ideally we embed both. Here we Query(Answer) using Q as query text.
+            
+            try:
+                # 1. Store Answer temporarily (or permanently as record)
+                vector_memory.store_narrative("TEMP_EARNINGS", qa['answer'], {"type": "ANSWER"})
+                
+                # 2. Check distance
+                match = vector_memory.collection.query(query_texts=[qa['question']], n_results=1, where={"agent": "TEMP_EARNINGS"})
+                dist = match['distances'][0][0]
+                
+                if dist > 1.25: # Tuned Threshold
+                    evasion_count += 1
+                    evasion_details.append(f"Evaded '{qa['question'][:30]}...' (Dist: {dist:.2f})")
+            except:
+                pass
+        
+        if evasion_count > 0:
+            severity = "High"
+            explanation += f" [EARNINGS ALERT: {evasion_count} Evasive Answers Detected]"
+            audit_verdict = "Evasive Management"
+
         # 4. Construct Signal & Memo
         signal = {
             "agent": "CFO",
@@ -106,7 +138,32 @@ class CFOAgent(BaseAgent):
             "confidence": signal["confidence"],
             "explanation": f"[{audit_verdict}] {explanation}"
         }
-        insert_snapshot(snapshot_data)
+        # 6. Vector Memory & Semantic Risk Check
+        try:
+            # A. Check against Risk Archetypes (The 'Benefit' of Vector DB)
+            matches = vector_memory.find_similar_events(explanation, n=1)
+            if matches and matches['documents']:
+                top_match_text = matches['documents'][0][0]
+                top_match_meta = matches['metadatas'][0][0]
+                
+                # If we match a high-risk archetype with high similarity (heuristic check)
+                if top_match_meta.get('agent') in ['ARCHETYPE_DISTRESS', 'ARCHETYPE_CONTRACTION']:
+                    print(f"[CFO SEMANTIC ALERT] Logic matches known risk pattern: '{top_match_meta.get('type')}'")
+                    # We could escalate severity here, but for now we just log/augment
+                    explanation += f" [SEMANTIC MATCH: {top_match_meta.get('type')}]"
+
+            # B. Store the new memory
+            vector_memory.store_narrative(
+                agent="CFO",
+                text=f"{explanation} (PR Text Snippet: {latest_pr_text[:200]}...)",
+                metadata={
+                    "mode": financial_mode,
+                    "severity": severity,
+                    "audit_verdict": audit_verdict
+                }
+            )
+        except Exception as e:
+            print(f"[WARNING] Vector ops failed: {e}")
 
         return signal
 
