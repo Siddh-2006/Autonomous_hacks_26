@@ -20,6 +20,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- SERVE FRONTEND (STATIC FILES) ---
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Mount the 'frontend' directory to serve CSS/JS if needed, or just the index
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
+
+@app.get("/")
+async def read_root():
+    return FileResponse('frontend/index.html')
+
 @app.on_event("startup")
 def startup():
     init_db()
