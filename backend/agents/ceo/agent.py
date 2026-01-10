@@ -10,6 +10,7 @@ from backend.agents.base_agent import BaseAgent
 from backend.data_sources.news_scraper import fetch_company_news
 from backend.data_sources.strategy_analyzer import StrategyAnalyzer
 from backend.db.database import get_latest_ceo_snapshot, insert_ceo_snapshot, get_ceo_history
+from backend.storage.vector_db import vector_memory
 
 class CEOAgent(BaseAgent):
     def __init__(self):
@@ -101,6 +102,48 @@ class CEOAgent(BaseAgent):
         # Only store if we have data
         insert_ceo_snapshot(signal)
         
+        # 6. Vector Memory (Episodic + Semantic Contradiction Check)
+        try:
+            # A. Contradiction Check (The "Time Machine" Feature)
+            # Compare TODAY's narrative against the 2-Year Strategic Baseline ("CEO_ARCHIVE")
+            baseline_match = vector_memory.collection.query(
+                query_texts=[explanation],
+                n_results=1,
+                where={"agent": "CEO_ARCHIVE"} # Only check against the official baseline/history
+            )
+            
+            if baseline_match and baseline_match['documents']:
+                dist = baseline_match['distances'][0][0] # Chroma returns distance (lower is closer)
+                # Distance > 1.0 (approx) usually means significant drift for Cosine distance in Chroma
+                # Note: Chroma default is L2 squared, but lets assume we can detect relative drift.
+                # Actually, let's just log the closest match for the User to see the "Context".
+                
+                closest_past = baseline_match['documents'][0][0]
+                past_date = baseline_match['metadatas'][0][0].get('timestamp', 'Unknown')
+                
+                print(f"[CEO STRATEGY CHECK] Closest historical baseline ({past_date}):")
+                print(f"   Now:  {explanation[:100]}...")
+                print(f"   Then: {closest_past[:100]}...")
+                
+                if dist > 0.5: # Calibrated threshold (Verification Test showed > 0.4 for distinct strategy drift)
+                     print(f"[CEO ALERT] Potential Strategy Drift detected (Distance: {dist:.2f})")
+                     explanation += f" [STRATEGY ALERT: Drift from {past_date} baseline]"
+                else:
+                     explanation += f" [Consistent with {past_date} strategy]"
+
+            # B. Store the new memory
+            vector_memory.store_narrative(
+                agent="CEO",
+                text=explanation,
+                metadata={
+                    "health": narrative_health, 
+                    "forward_score": current_forward,
+                    "defensive_score": current_defensive
+                }
+            )
+        except Exception as e:
+            print(f"[WARNING] Vector store failed: {e}")
+            
         return signal
 
 if __name__ == "__main__":

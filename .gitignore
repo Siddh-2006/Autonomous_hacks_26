@@ -1,80 +1,8 @@
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual environments
+*.pyc
 .env
-.venv
-env/
+chroma_data/
 venv/
-ENV/
-env.bak/
-venv.bak/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.npm
-.eslintcache
-
-# React build
-/frontend/build
-/frontend/.env.local
-/frontend/.env.development.local
-/frontend/.env.test.local
-/frontend/.env.production.local
-
-# Storage files (optional - remove if you want to track them)
-/backend/storage/*.json
-/backend/storage/vector_memory.json
-
-# API Keys and secrets
-.env
-config.local.py
-*.key
-*.pem
-
-# Logs
-*.log
-logs/
-
-# Temporary files
-*.tmp
-*.temp
+.pytest_cache/
+*.db
+backend/storage/chroma_data/

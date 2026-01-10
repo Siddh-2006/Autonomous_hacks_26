@@ -1,11 +1,9 @@
-import time
-import schedule
 import sys
 import os
 from datetime import datetime
 
 # Add backend directory to Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend.agents.cto.agent import CTOAgent
 from backend.agents.cfo.agent import CFOAgent
@@ -16,7 +14,7 @@ def run_pipeline():
     print(f"\n[SCHEDULER] Starting Executive Audit at {datetime.now().isoformat()}...")
     
     try:
-        # 1. Run Core Agents (Parallel execution would be better in prod, serial is safer here)
+        # 1. Run Core Agents
         print("  > Running CFO Agent...")
         cfo = CFOAgent().analyze()
         print(f"    [CFO] Mode: {cfo.get('financial_mode', 'N/A')}")
@@ -34,22 +32,10 @@ def run_pipeline():
         board = ExecutiveReasoningAgent().analyze()
         print(f"    [BOARD] Verdict: {board.get('overall_risk', 'UNKNOWN')}")
         
-        print(f"[SCHEDULER] Audit Complete. Sleeping...\n")
+        print(f"[SCHEDULER] Audit Complete.\n")
         
     except Exception as e:
         print(f"[SCHEDULER] Error in pipeline: {e}")
 
 if __name__ == "__main__":
-    print("--- Auto-Diligence Scheduler ---")
-    print("Mode: ACTIVE")
-    print("Interval: Every 6 Hours")
-    
-    # Run immediately on startup
     run_pipeline()
-    
-    # Schedule
-    schedule.every(6).hours.do(run_pipeline)
-    
-    while True:
-        schedule.run_pending()
-        time.sleep(60)
