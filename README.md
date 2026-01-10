@@ -1,140 +1,106 @@
-# 🧠 Auto-Diligence: The Autonomous Executive Suite
+# 🧠 Auto-Diligence: The Autonomous Executive Board
 
 > **"Wall Street Intelligence in a Box"**
-> An autonomous multi-agent system that audits companies like a Forensic Accountant and strategizes like a Fortune 500 CEO.
+> An autonomous multi-agent system that audits companies like a Forensic Accountant, strategizes like a CEO, and reviews code like a CTO.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Status: Live](https://img.shields.io/badge/System-Live-green)
-![Data: Real-Time](https://img.shields.io/badge/Data-Real%20Time%20APIs-blue)
+[![Status: Production](https://img.shields.io/badge/Status-Production-green)](https://railway.app)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app)
 
 ---
 
 ## 🚨 The The Problem: "Diligence is Broken"
 In today's market, "Truth" is fragmented.
-*   **Narrative vs. Reality Gap**: Executives say "We are investing for growth" (Press Releases), but silently freeze hiring (Careers Page).
-*   **Information Overload**: No human can read every news article and cross-reference it with scraping data daily.
-*   **Latency**: Quarterly earnings calls happen every 90 days. **Strategy breaks weeks before the numbers do.**
+*   **Narrative vs. Reality Gap**: Executives say "We are investing for growth", but silently freeze hiring or stop shipping code.
+*   **High Latency**: Quarterly earnings happen every 90 days. **Strategy breaks weeks before the numbers do.**
+*   **Blindspots**: Financial analysts don't read GitHub commit logs.
 
-## ⚡ The Solution: Autonomous Executive Agents
-We don't build "chatbots". We build **Job-Specific Agents** that live on the internet, wake up autonomously, and perform rigorous professional work.
+## ⚡ The Solution: 3 Autonomous Executive Agents
+We built **Job-Specific Agents** that live on the internet, wake up autonomously, and perform rigorous professional work 24/7.
 
 | Agent | Role | Source of Truth | Core Question |
 | :--- | :--- | :--- | :--- |
-| **🕵️‍♂️ CFO Agent** | **Forensic Auditor** | **Hiring Data (Greenhouse API)** | "Is the company cutting costs while claiming growth?" |
-| **♟️ CEO Agent** | **Strategic Sentinel** | **Google News (RSS)** | "Is the strategic narrative becoming defensive or confident?" |
+| **🕵️‍♂️ CFO Agent** | **Forensic Auditor** | **Greenhouse / Earnings Q&A** | "Is the company cutting costs while claiming growth? Is management evading questions?" |
+| **♟️ CEO Agent** | **Strategic Sentinel** | **Google News / SEC Filings** | "Is the strategic narrative becoming defensive? Is there 'Strategy Drift' from 2 years ago?" |
+| **👨‍💻 CTO Agent** | **Tech Auditor** | **GitHub API** | "Is engineering velocity slowing? Is there a 'Bus Factor' risk (knowledge silo)?" |
 
 ---
 
-## 🏗️ System Architecture (End-to-End)
+## 📚 Documentation (Deep Dives)
+Each agent is a complex system. Read their "Brain" logic here:
+*   [**👉 CFO Agent Guide**](CFO_AGENT_EXPLAINED.md) (Forensics & Evasion Detection)
+*   [**👉 CEO Agent Guide**](CEO_AGENT_EXPLAINED.md) (Strategy Drift & Vectors)
+*   [**👉 CTO Agent Guide**](CTO_AGENT_EXPLAINED.md) (Bus Factor & Velocity)
+*   [**☁️ Deployment Cheat Sheet**](docs/DEPLOYMENT_CHEAT_SHEET.md) (Railway.app Guide)
 
-This system follows a strict **3-Tier Agentic Architecture** to ensure reliability, auditability, and scalability.
+---
+
+## 🏗️ System Architecture (Vector-Enhanced)
+
+This system uses a **Hybrid Architecture** (SQL + Vector) to remember the past and detecting anomalies.
 
 ```mermaid
 graph TD
-    subgraph "Tier 1: Data Collection & Resiliency"
+    subgraph "Tier 1: Sensors"
         Internet((Internet))
-        Greenhouse[Greenhouse API]
-        GNews[Google News RSS]
-        Scraper1[Careers Scraper]
-        Scraper2[News Scraper]
-        
-        Internet --> Greenhouse
-        Internet --> GNews
-        Greenhouse --> Scraper1
-        GNews --> Scraper2
+        Greenhouse[Careers Page]
+        GNews[Google News]
+        GitHub[GitHub API]
     end
 
-    subgraph "Tier 2: Intelligence Layer (The Brain)"
+    subgraph "Tier 2: The Executive Board (Agents)"
         CFO[👮 CFO Agent]
         CEO[🧠 CEO Agent]
+        CTO[👨‍💻 CTO Agent]
         
-        Scraper1 -->|Job Titles & Seniority| CFO
-        Scraper2 -->|Headlines & Summaries| CEO
-        
-        Logic1{Forensic Logic}
-        Logic2{Time-Based Reasoning}
-        
-        CFO --> Logic1
-        CEO --> Logic2
+        Greenhouse --> CFO
+        GNews --> CEO
+        GitHub --> CTO
     end
 
-    subgraph "Tier 3: Storage & Memory"
-        DB[(SQLite Database)]
-        Snapshot1[CFO Snapshots]
-        Snapshot2[CEO Snapshots]
+    subgraph "Tier 3: The Brain (Memory)"
+        SQL[(SQLite History)]
+        Vector[(ChromaDB Semantic Memory)]
         
-        Logic1 -->|Audit Verdict| DB
-        Logic2 -->|Narrative Health| DB
-        DB --> Snapshot1
-        DB --> Snapshot2
+        CFO -->|Evasion Checks| Vector
+        CEO -->|Strategy Baseline| Vector
+        
+        CFO -->|Snapshots| SQL
+        CEO -->|Snapshots| SQL
+        CTO -->|Snapshots| SQL
     end
 
-    subgraph "Tier 4: Actionable Output"
-        Memo[📄 CFO Output: Forensic Memo]
-        Dashboard[📊 CEO Output: Strategy Report]
+    subgraph "Tier 4: The Product"
+        Dashboard[📊 Premium Dark Grid Dashboard]
+        API[⚡ FastAPI Backend]
         
-        Snapshot1 --> Memo
-        Snapshot2 --> Dashboard
+        SQL --> API
+        API --> Dashboard
     end
-    
-    style CFO fill:#ff9999,stroke:#333,stroke-width:2px
-    style CEO fill:#99ccff,stroke:#333,stroke-width:2px
-    style DB fill:#eee,stroke:#333,stroke-width:2px
 ```
 
-### 🧠 How It Works (The "Brain" Logic)
+## 🚀 Quick Start (Running Locally)
 
-#### 1. The CFO Agent (Forensic Audit)
-It doesn't just count jobs. It looks for **"Narrative Disconnects"**:
-*   *IF* Management says "Growth" (Linguistic Analysis > 7/10)
-*   *AND* Technical Hiring is dropping (-15% MoM)
-*   *THEN* **FLAG**: "Juniorization" or "Deceptive Narrative".
-
-#### 2. The CEO Agent (Strategic Health)
-It uses **Time-Based Reasoning**:
-*   It remembers the past (SQLite History).
-*   It detects *changes* in tone. (e.g., "Defensive language increased 40% this week").
-*   It filters out noise and focuses on long-term signal.
-
----
-
-## 🚀 Quick Start (Running the System)
-
-The system is configured to run out-of-the-box with **LIVE DATA**.
-
-### 1. Run the CFO Agent (Forensic Audit)
+### 1. Install & Run
 ```bash
-python "backend/agents/cfo/agent.py"
-```
-*   **What happens**: Fetches live roles from Couchbase via Greenhouse API, analyzes seniority, checks against history, and acts as a Forensic Auditor.
-*   **Output**: Generates `CFO_MEMO.md` (Board-level memo).
+# Install Dependencies
+pip install -r requirements.txt
 
-### 2. Run the CEO Agent (Strategy Check)
+# Run the Full Board (Scheduler)
+python backend/scheduler/run_agents.py
+```
+
+### 2. View the Dashboard
 ```bash
-python "backend/agents/ceo/agent.py"
+# Launch the API
+python launch_dashboard.py
 ```
-*   **What happens**: Scrapes Google News for "Couchbase strategy", analyzes linguistic tone (Forward-looking vs Defensive), and compares valid trends.
-*   **Output**: JSON Strategy Report.
+Open `frontend/index.html` in your browser.
 
----
+## ☁️ Deployment (Railway)
+This system is designed for **Persistent Cloud** deployment (Railway/Render).
+It includes an **Auto-Backfill Hook**:
+*   On first deploy, it automatically downloads 2 years of historical data into the Vector DB.
+*   It seeds the "Thesis Timeline" so your dashboard looks populated instantly.
 
-## 📂 Project Structure
-
-```bash
-auto-diligence/
-├── backend/
-│   ├── agents/           # The "Brain" of each role
-│   │   ├── cfo/          # CFO Agent Logic
-│   │   └── ceo/          # CEO Agent Logic
-│   ├── data_sources/     # Tier 1: Scrapers & APIs
-│   │   ├── careers_scraper.py   # Greenhouse API integration
-│   │   └── news_scraper.py      # Google News RSS interaction
-│   └── db/               # Tier 3: Memory
-│       └── cfo.db        # SQLite Database
-├── CFO_AGENT_MASTER_GUIDE.md  # Deep dive into CFO Agent
-├── CEO_AGENT_EXPLAINED.md     # Deep dive into CEO Agent
-└── README.md             # You are here
-```
-
-> **"Strategy breaks in language before it breaks in numbers."**
-> This agent exists to detect that moment.
+See [Deployment Cheat Sheet](docs/DEPLOYMENT_CHEAT_SHEET.md).

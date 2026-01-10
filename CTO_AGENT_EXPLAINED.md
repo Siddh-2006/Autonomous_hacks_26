@@ -30,17 +30,18 @@ A real CTO evaluates a company by looking at its **Engineering Velocity** and **
         *   *Stagnant*: Commits ↓ 20% AND No new repos in 90 days.
         *   *Maintenance Mode*: High Issue closure, Low new feature commits.
         *   *Hyper-Growth*: Commits ↑ 30% AND "AI/Vector" keywords in new repos.
-    *   **Risk Analysis**: Detects key developer churn (if public contributions drop for top maintainers).
+    *   **Risk Analysis (The Elite Metric)**: 
+        *   **Bus Factor**: Detects if high output depends on < 3 engineers. 
+        *   *Signal*: `bus_factor_risk = True` -> Warning "Fragile Velocity".
 
 ### Tier 3: Storage (Memory)
 *   **Table: `cto_snapshots`**:
     *   `innovation_score` (0-10)
-    *   `technical_debt_proxy` (Issue/Commit ratio)
-    *   `engineering_momentum` (Strong | Neutral | Weak)
+    *   `execution_health` (Strong | Stable | Declining)
 
 ---
 
-## 3. End-to-End Workflow (Planned)
+## 3. End-to-End Workflow (Implemented)
 
 ```mermaid
 sequenceDiagram
@@ -51,12 +52,12 @@ sequenceDiagram
 
     Scheduler->>CTO: Wake Up (Daily Check)
     CTO->>GH: Fetch Commit Activity (Last 30d)
-    CTO->>GH: Frequency Analysis (Pulse)
+    CTO->>GH: Analyze Contributor Distribution (Bus Factor)
     
     rect rgb(200, 255, 200)
         Note over CTO: "Innovation Logic"
         CTO->>CTO: Calculate Momentum Score
-        CTO->>CTO: Compare vs Historical Baseline
+        CTO->>CTO: Check for Knowledge Silos
     end
     
     CTO->>DB: Store Snapshot (Innovation Health)

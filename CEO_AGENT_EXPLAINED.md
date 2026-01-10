@@ -40,6 +40,13 @@ This agent replicates that thinking using a **Time-Based Reasoning** engine. It 
     *   Stores `narrative_health`, `forward_score`, `defensive_score`, and raw signals for every run.
     *   Crucial for the "Time-Based Reasoning" mechanism.
 
+### Tier 4: Vector Contradiction Engine (Phase 2)
+*   **Goal**: Detect "Strategy Drift" over years.
+*   **Mechanism**:
+    *   Stores historical statements in **ChromaDB**.
+    *   Compares today's "Strategy" vector against the 2022 baseline.
+    *   **Alert**: "Contradiction Detected" if semantic distance > 0.5.
+
 ---
 
 ## 3. How to Run & Verify
