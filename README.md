@@ -1,81 +1,140 @@
-# Auto-Diligence System
+# 🧠 Auto-Diligence: The Autonomous Executive Suite
 
-Autonomous Agent-Based Investor Due Diligence & Monitoring System
+> **"Wall Street Intelligence in a Box"**
+> An autonomous multi-agent system that audits companies like a Forensic Accountant and strategizes like a Fortune 500 CEO.
 
-## Overview
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Status: Live](https://img.shields.io/badge/System-Live-green)
+![Data: Real-Time](https://img.shields.io/badge/Data-Real%20Time%20APIs-blue)
 
-This system continuously evaluates a company's health from the perspective of its executive leadership (CEO, CTO, CFO, CPO, and Board) using only publicly available data.
+---
 
-## Architecture
+## 🚨 The The Problem: "Diligence is Broken"
+In today's market, "Truth" is fragmented.
+*   **Narrative vs. Reality Gap**: Executives say "We are investing for growth" (Press Releases), but silently freeze hiring (Careers Page).
+*   **Information Overload**: No human can read every news article and cross-reference it with scraping data daily.
+*   **Latency**: Quarterly earnings calls happen every 90 days. **Strategy breaks weeks before the numbers do.**
 
-### Backend (Python/FastAPI)
-- **Agents**: Specialized agents for each executive perspective
-  - CEO Agent: Strategy & narrative analysis
-  - CTO Agent: Technology & execution monitoring
-  - CFO Agent: Financial discipline & cost signals
-  - CPO Agent: Product & user reality
-  - Risk Agent: Governance & legal risks
+## ⚡ The Solution: Autonomous Executive Agents
+We don't build "chatbots". We build **Job-Specific Agents** that live on the internet, wake up autonomously, and perform rigorous professional work.
 
-- **Reasoning Engine**: Cross-agent logic and alert generation
-- **Data Sources**: GitHub, news, hiring, product signals
-- **Storage**: JSON-based signal storage with optional vector memory
+| Agent | Role | Source of Truth | Core Question |
+| :--- | :--- | :--- | :--- |
+| **🕵️‍♂️ CFO Agent** | **Forensic Auditor** | **Hiring Data (Greenhouse API)** | "Is the company cutting costs while claiming growth?" |
+| **♟️ CEO Agent** | **Strategic Sentinel** | **Google News (RSS)** | "Is the strategic narrative becoming defensive or confident?" |
 
-### Frontend (React)
-- Real-time dashboard showing agent status
-- Alert notifications
-- Timeline of events
-- Current investment thesis
+---
 
-## Quick Start
+## 🏗️ System Architecture (End-to-End)
 
-### Backend Setup
+This system follows a strict **3-Tier Agentic Architecture** to ensure reliability, auditability, and scalability.
+
+```mermaid
+graph TD
+    subgraph "Tier 1: Data Collection & Resiliency"
+        Internet((Internet))
+        Greenhouse[Greenhouse API]
+        GNews[Google News RSS]
+        Scraper1[Careers Scraper]
+        Scraper2[News Scraper]
+        
+        Internet --> Greenhouse
+        Internet --> GNews
+        Greenhouse --> Scraper1
+        GNews --> Scraper2
+    end
+
+    subgraph "Tier 2: Intelligence Layer (The Brain)"
+        CFO[👮 CFO Agent]
+        CEO[🧠 CEO Agent]
+        
+        Scraper1 -->|Job Titles & Seniority| CFO
+        Scraper2 -->|Headlines & Summaries| CEO
+        
+        Logic1{Forensic Logic}
+        Logic2{Time-Based Reasoning}
+        
+        CFO --> Logic1
+        CEO --> Logic2
+    end
+
+    subgraph "Tier 3: Storage & Memory"
+        DB[(SQLite Database)]
+        Snapshot1[CFO Snapshots]
+        Snapshot2[CEO Snapshots]
+        
+        Logic1 -->|Audit Verdict| DB
+        Logic2 -->|Narrative Health| DB
+        DB --> Snapshot1
+        DB --> Snapshot2
+    end
+
+    subgraph "Tier 4: Actionable Output"
+        Memo[📄 CFO Output: Forensic Memo]
+        Dashboard[📊 CEO Output: Strategy Report]
+        
+        Snapshot1 --> Memo
+        Snapshot2 --> Dashboard
+    end
+    
+    style CFO fill:#ff9999,stroke:#333,stroke-width:2px
+    style CEO fill:#99ccff,stroke:#333,stroke-width:2px
+    style DB fill:#eee,stroke:#333,stroke-width:2px
+```
+
+### 🧠 How It Works (The "Brain" Logic)
+
+#### 1. The CFO Agent (Forensic Audit)
+It doesn't just count jobs. It looks for **"Narrative Disconnects"**:
+*   *IF* Management says "Growth" (Linguistic Analysis > 7/10)
+*   *AND* Technical Hiring is dropping (-15% MoM)
+*   *THEN* **FLAG**: "Juniorization" or "Deceptive Narrative".
+
+#### 2. The CEO Agent (Strategic Health)
+It uses **Time-Based Reasoning**:
+*   It remembers the past (SQLite History).
+*   It detects *changes* in tone. (e.g., "Defensive language increased 40% this week").
+*   It filters out noise and focuses on long-term signal.
+
+---
+
+## 🚀 Quick Start (Running the System)
+
+The system is configured to run out-of-the-box with **LIVE DATA**.
+
+### 1. Run the CFO Agent (Forensic Audit)
 ```bash
-cd backend
-pip install -r ../requirements.txt
-python scheduler/run_agents.py
+python "backend/agents/cfo/agent.py"
 ```
+*   **What happens**: Fetches live roles from Couchbase via Greenhouse API, analyzes seniority, checks against history, and acts as a Forensic Auditor.
+*   **Output**: Generates `CFO_MEMO.md` (Board-level memo).
 
-### Frontend Setup
+### 2. Run the CEO Agent (Strategy Check)
 ```bash
-cd frontend
-npm install
-npm start
+python "backend/agents/ceo/agent.py"
 ```
+*   **What happens**: Scrapes Google News for "Couchbase strategy", analyzes linguistic tone (Forward-looking vs Defensive), and compares valid trends.
+*   **Output**: JSON Strategy Report.
 
-### Run Demo
+---
+
+## 📂 Project Structure
+
 ```bash
-python scripts/simulate_change.py
-```
-
-## Key Features
-
-- **Autonomous Monitoring**: Agents run continuously without human intervention
-- **Executive Perspective**: Each agent thinks like a senior executive
-- **Explainable Alerts**: Clear reasoning for why alerts are triggered
-- **Memory**: Historical context for better decision making
-- **Single Critical Alert**: "Material Execution Risk" to avoid alert fatigue
-
-## File Structure
-
-```
 auto-diligence/
 ├── backend/
-│   ├── agents/          # Executive perspective agents
-│   ├── reasoning/       # Cross-agent logic
-│   ├── data_sources/    # Data collection modules
-│   ├── storage/         # Signal and history storage
-│   ├── alerts/          # Alert generation
-│   └── scheduler/       # Agent orchestration
-├── frontend/
-│   └── src/            # React dashboard components
-└── scripts/            # Demo and utility scripts
+│   ├── agents/           # The "Brain" of each role
+│   │   ├── cfo/          # CFO Agent Logic
+│   │   └── ceo/          # CEO Agent Logic
+│   ├── data_sources/     # Tier 1: Scrapers & APIs
+│   │   ├── careers_scraper.py   # Greenhouse API integration
+│   │   └── news_scraper.py      # Google News RSS interaction
+│   └── db/               # Tier 3: Memory
+│       └── cfo.db        # SQLite Database
+├── CFO_AGENT_MASTER_GUIDE.md  # Deep dive into CFO Agent
+├── CEO_AGENT_EXPLAINED.md     # Deep dive into CEO Agent
+└── README.md             # You are here
 ```
 
-## Philosophy
-
-This system automates what institutional investors already do manually:
-- Continuous due diligence
-- Risk monitoring  
-- Thesis validation
-
-It behaves like a permanent analyst team that never sleeps, never forgets history, and never relies on gut feeling.
+> **"Strategy breaks in language before it breaks in numbers."**
+> This agent exists to detect that moment.
