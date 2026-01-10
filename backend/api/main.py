@@ -4,7 +4,8 @@ import uvicorn
 import os
 import sys
 
-sys.path.append("d:/Autonomous _hacks/auto-diligence")
+
+# sys.path.append("d:/Autonomous _hacks/auto-diligence") # Removed for Cloud Compatibility
 
 from backend.db.database import get_latest_cfo_snapshot, get_latest_ceo_snapshot, get_latest_cto_snapshot, init_db
 from backend.reasoning.evaluator import ExecutiveEvaluator
