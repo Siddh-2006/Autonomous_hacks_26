@@ -16,15 +16,16 @@ class TestCTOLive(unittest.TestCase):
         result = self.agent.analyze()
         
         # 1. Check Critical Metrics
-        commits = result['signals']['total_commits_last_30d'] # signals dict key from agent.py
-        # Wait, let's check agent.py structure. it returns 'signals' inside result?
-        # Looking at previous code, `result` HAS `signals` dict.
+        # 1. Check Critical Metrics
+        # commits = result['signals']['total_commits_last_30d'] # REMOVED: Incorrect Key
+        # Verify keys first
         # But `metrics` keys were flat in `analyze` variables, let's double check.
         # The agent returns: "signals": {...} which contains 'total_commits_last_30d'?? 
         # Check `backend/agents/cto/agent.py` line 70:
         # "signals": { "commit_velocity_change_pct", "release_cadence", "new_repos_90d", "active_contributors" }
         # Ah, `total_commits` is a top level internal field.
         
+        print(f"[DEBUG] CTO Result Keys: {result.keys()}")
         commits = result.get('total_commits') # Top level key
         print(f"[CTO] Commits Last 30d: {commits}")
         

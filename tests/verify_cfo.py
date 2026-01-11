@@ -2,8 +2,9 @@
 import sys
 import os
 current = os.path.dirname(os.path.abspath(__file__))
-if current not in sys.path:
-    sys.path.append(current)
+parent = os.path.dirname(current)
+if parent not in sys.path:
+    sys.path.append(parent)
 
 import unittest
 
