@@ -328,6 +328,24 @@
             }
         }
 
+        /* --- CYBER SELECT --- */
+        .cyber-select {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .cyber-select:hover {
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+
         /* --- VIEW TRANSITIONS --- */
         .view-section {
             display: none;
@@ -455,17 +473,31 @@
                 </div>
 
                 <div style="display: flex; gap: 15px; align-items: center;">
+                    <!-- SIMULATION CONTROLS -->
+                    <div id="sim-controls" style="display:flex; gap:10px; align-items:center;">
+                        <select id="scenario-select" class="cyber-select" onchange="runSimulation()">
+                            <option value="">-- LIVE MODE --</option>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+
                     <!-- INTERACTIVE SCAN BUTTON -->
                     <button class="cyber-btn" onclick="triggerScan()">
                         <span class="btn-text">INITIATE SCAN</span>
                         <span class="btn-glitch"></span>
                     </button>
 
-                    <div class="status-pill">
+                    <div id="sys-status" class="status-pill">
                         <div class="pulse"></div>
                         SYSTEM ACTIVE
                     </div>
                 </div>
+            </div>
+
+            <!-- SIMULATION BANNER -->
+            <div id="sim-banner"
+                style="display:none; background: repeating-linear-gradient(45deg, #2a1a00, #2a1a00 10px, #3a2a00 10px, #3a2a00 20px); border: 1px solid #ffcc00; color: #ffcc00; padding: 10px; text-align: center; font-family: var(--font-mono); margin-bottom: 20px; border-radius: 6px;">
+                ⚠️ SIMULATION MODE ACTIVE: DATA IS SYNTHETIC
             </div>
 
             <!-- VIEW: DASHBOARD -->
@@ -704,10 +736,67 @@
             // We'll let updateUI handle DOM population.
         }
 
+        // --- SIMULATION LOGIC ---
+        let isSimulating = false;
+        let simInterval = null;
+
+        async function loadScenarios() {
+            try {
+                const res = await fetch('/api/scenarios');
+                const scenarios = await res.json();
+                const sel = document.getElementById('scenario-select');
+                scenarios.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.innerText = `⚠️ SIM: ${s.name}`;
+                    sel.appendChild(opt);
+                });
+            } catch (e) { console.error("Failed to load scenarios", e); }
+        }
+
+        async function runSimulation() {
+            const sel = document.getElementById('scenario-select');
+            const scenarioId = sel.value;
+            const banner = document.getElementById('sim-banner');
+            const status = document.getElementById('sys-status');
+
+            if (!scenarioId) {
+                // Return to LIVE
+                isSimulating = false;
+                banner.style.display = 'none';
+                status.innerHTML = '<div class="pulse"></div> SYSTEM ACTIVE';
+                status.style.color = 'var(--success)';
+                status.style.borderColor = 'rgba(46, 204, 113, 0.2)';
+                status.style.background = 'rgba(46, 204, 113, 0.1)';
+                poll(); // Immediate refresh
+                return;
+            }
+
+            // Enter SIMULATION
+            isSimulating = true;
+            banner.style.display = 'block';
+            status.innerText = '⚠️ SIMULATION';
+            status.style.color = '#ffcc00';
+            status.style.borderColor = '#ffcc00';
+            status.style.background = 'rgba(255, 204, 0, 0.1)';
+
+            try {
+                const res = await fetch('/api/board/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scenario_id: scenarioId })
+                });
+                const data = await res.json();
+                updateUI(data); // Render Sim Data
+            } catch (e) { console.error("Sim Failed", e); }
+        }
+
         // --- DATA LOGIC ---
         const API_URL = "/api/board/status";
 
         async function init() {
+            loadScenarios(); // NEW: Load Scenarios
+
             // Remove loader
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = 0;
@@ -715,10 +804,13 @@
             }, 1000);
 
             poll();
-            setInterval(poll, 5000);
+            setInterval(() => {
+                if (!isSimulating) poll(); // Only poll if NOT simulating
+            }, 5000);
         }
 
         async function poll() {
+            if (isSimulating) return; // Guard clause
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();

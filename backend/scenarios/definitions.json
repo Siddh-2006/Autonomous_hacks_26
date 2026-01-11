@@ -1,0 +1,69 @@
+{
+    "scenarios": [
+        {
+            "id": "execution_stress",
+            "name": "Execution Stress (The Stalled Engine)",
+            "description": "Simulation: Engineering velocity drops by 35% and release cadence stalls.",
+            "overrides": {
+                "cto": {
+                    "execution_health": "Declining",
+                    "explanation": "SIMULATION: Velocity down 35%, Critical PRs stalled.",
+                    "bus_factor_risk": true
+                }
+            }
+        },
+        {
+            "id": "financial_stress",
+            "name": "Financial Stress (The Cash Crunch)",
+            "description": "Simulation: Hiring freezes implemented to preserve runway.",
+            "overrides": {
+                "cfo": {
+                    "financial_mode": "Cost-Control",
+                    "explanation": "SIMULATION: 0 Open Roles detected (Hiring Freeze)."
+                }
+            }
+        },
+        {
+            "id": "product_stress",
+            "name": "Product Crisis (The Revolt)",
+            "description": "Simulation: User issues spike, sentiment turns negative.",
+            "overrides": {
+                "cpo": {
+                    "product_health": "Stressed",
+                    "issue_pressure": "Critical",
+                    "explanation": "SIMULATION: Issue volume spiked 50% vs last week."
+                }
+            }
+        },
+        {
+            "id": "narrative_stress",
+            "name": "Narrative Pivot (Defensive)",
+            "description": "Simulation: Leadership tone becomes defensive and contradictory.",
+            "overrides": {
+                "ceo": {
+                    "narrative_health": "Weakening",
+                    "explanation": "SIMULATION: Defensive tone detected in recent Comms."
+                }
+            }
+        },
+        {
+            "id": "death_spiral",
+            "name": "The Death Spiral (Composite)",
+            "description": "Simulation: Execution failures compounded by financial distress and user churn.",
+            "overrides": {
+                "cto": {
+                    "execution_health": "Critical"
+                },
+                "cfo": {
+                    "financial_mode": "Distress"
+                },
+                "cpo": {
+                    "product_health": "Declining"
+                },
+                "ceo": {
+                    "narrative_health": "Critical"
+                }
+            }
+        }
+    ]
+}

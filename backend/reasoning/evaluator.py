@@ -11,12 +11,18 @@ class ExecutiveEvaluator:
     def __init__(self):
         pass
         
-    def evaluate_current_state(self):
-        # 1. Load Latest Snapshots (The "Board Packet")
-        cfo = get_latest_cfo_snapshot() or {}
-        ceo = get_latest_ceo_snapshot() or {}
-        cto = get_latest_cto_snapshot() or {}
-        cpo = get_latest_cpo_snapshot() or {}
+    def evaluate_current_state(self, manual_snapshots=None):
+        # 1. Load Snapshots (Real or Simulated)
+        if manual_snapshots:
+            cfo = manual_snapshots.get('cfo', {})
+            ceo = manual_snapshots.get('ceo', {})
+            cto = manual_snapshots.get('cto', {})
+            cpo = manual_snapshots.get('cpo', {})
+        else:
+            cfo = get_latest_cfo_snapshot() or {}
+            ceo = get_latest_ceo_snapshot() or {}
+            cto = get_latest_cto_snapshot() or {}
+            cpo = get_latest_cpo_snapshot() or {}
         
         # 2. Apply Rules
         verdict = evaluate_executive_risk(cfo, cto, ceo, cpo)

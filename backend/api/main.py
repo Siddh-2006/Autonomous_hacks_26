@@ -11,15 +11,38 @@ from backend.db.database import get_latest_cfo_snapshot, get_latest_ceo_snapshot
 from backend.reasoning.evaluator import ExecutiveEvaluator
 # We might want to trigger runs via API too, but let's stick to reading first
 from backend.agents.executive_reasoning_agent import ExecutiveReasoningAgent
+from backend.scenarios.controller import ScenarioController
+from pydantic import BaseModel
 
-app = FastAPI(title="Auto-Diligence Executive API")
+app = FastAPI()
 
+# Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class SimulationRequest(BaseModel):
+    scenario_id: str
+
+@app.get("/api/scenarios")
+def list_scenarios():
+    """Get available simulation scenarios."""
+    controller = ScenarioController()
+    return controller.get_available_scenarios()
+
+@app.post("/api/board/simulate")
+def run_simulation(req: SimulationRequest):
+    """Run a specific simulation scenario."""
+    try:
+        controller = ScenarioController()
+        return controller.run_simulation(req.scenario_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 # --- SERVE FRONTEND (STATIC FILES) ---
 from fastapi.staticfiles import StaticFiles
