@@ -7,7 +7,7 @@ import sys
 
 # sys.path.append("d:/Autonomous _hacks/auto-diligence") # Removed for Cloud Compatibility
 
-from backend.db.database import get_latest_cfo_snapshot, get_latest_ceo_snapshot, get_latest_cto_snapshot, init_db
+from backend.db.database import get_latest_cfo_snapshot, get_latest_ceo_snapshot, get_latest_cto_snapshot, get_latest_cpo_snapshot, init_db
 from backend.reasoning.evaluator import ExecutiveEvaluator
 # We might want to trigger runs via API too, but let's stick to reading first
 from backend.agents.executive_reasoning_agent import ExecutiveReasoningAgent
