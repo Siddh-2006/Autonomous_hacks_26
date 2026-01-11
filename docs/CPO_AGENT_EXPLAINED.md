@@ -23,3 +23,22 @@ A real CPO asks:
 ## Integration
 *   Feeds into the **Executive Board**.
 *   Checks for **"Reality Gaps"**: If CEO says "Explosive Growth" but CPO says "Declining", reliability collapses.
+
+## Cross-Validation Rules (The "Truth Triangle")
+The Board compares the CPO against other agents to find "Lies":
+
+1.  **CPO vs CEO (The Reality Gap)**
+    *   *CEO*: "We are seeing unprecedented demand!" (Sentiment: Strong)
+    *   *CPO*: "Issue volume is flat, Star count is frozen." (Health: Declining)
+    *   *Verdict*: **CRITICAL RISK**. Narrative fabrication detected.
+
+2.  **CPO vs CTO (The Zombie Check)**
+    *   *CPO*: "Product Health is Healthy" (Lots of issues/stars)
+    *   *CTO*: "Zero commits in 3 months" (Health: Declining)
+    *   *Verdict*: **HIGH RISK**. Product is being used but not maintained (Technical Debt crisis imminent).
+
+3.  **CPO vs CFO (The Efficiency Check)**
+    *   *CPO*: "Massive user complaints (Pain)"
+    *   *CFO*: "Cost-Control (Firing support staff)"
+    *   *Verdict*: **HIGH RISK**. Cutting costs while the product is on fire.
+
