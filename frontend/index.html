@@ -430,6 +430,13 @@
                         <div style="font-size: 11px; color: var(--muted);">Commit cadence consistency</div>
                     </div>
 
+                    <!-- CPO CARD (NEW) -->
+                    <div class="card" style="grid-column:span 4">
+                        <h3>CPO Product Reality</h3>
+                        <div id="cpo-health" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">--</div>
+                        <div style="font-size: 11px; color: var(--muted);">Adoption vs Pain (Truth Check)</div>
+                    </div>
+
                     <!-- VISUALS: History Chart -->
                     <div class="card" style="grid-column:span 12">
                         <h3>Risk Trend Analysis (Six Month Window)</h3>
@@ -571,15 +578,17 @@
             document.getElementById('cfo-mode').innerText = agents.cfo ? agents.cfo.financial_mode : "N/A";
             document.getElementById('ceo-drift').innerText = agents.ceo ? agents.ceo.health : "N/A";
             document.getElementById('cto-health').innerText = agents.cto ? agents.cto.execution_health : "N/A";
+            document.getElementById('cpo-health').innerText = agents.cpo ? agents.cpo.product_health : "N/A";
 
-            // 2. Signals list
+            // 2. Signals list (Updated for CPO)
             const signalsDiv = document.getElementById('signal-container');
             signalsDiv.innerHTML = '';
 
             const signalList = [
                 { name: 'CFO Agent', msg: agents.cfo ? agents.cfo.explanation : "No data" },
                 { name: 'CEO Agent', msg: agents.ceo ? agents.ceo.explanation : "No data" },
-                { name: 'CTO Agent', msg: agents.cto ? agents.cto.explanation : "No data" }
+                { name: 'CTO Agent', msg: agents.cto ? agents.cto.explanation : "No data" },
+                { name: 'CPO Agent', msg: agents.cpo ? agents.cpo.explanation : "No data" }
             ];
 
             signalList.forEach(s => {
@@ -589,26 +598,36 @@
                 signalsDiv.appendChild(div);
             });
 
-            // 3. Risk Table
+            // 3. Risk Table (Added CPO Row)
             const riskTable = document.getElementById('risk-table');
             riskTable.innerHTML = `
         <tr>
-            <td>Execution</td>
+            <td>Execution (CTO)</td>
             <td style="color:${agents.cto?.execution_health === 'Declining' ? 'var(--danger)' : 'var(--success)'}">${agents.cto?.execution_health}</td>
             <td>
-                CTO Activity 
+                Activity & Bus Factor 
                 <span style="display:block; font-size:10px; color:var(--muted); margin-top:2px;">
                     ${agents.cto?.bus_factor_risk ? '⚠️ High Bus Factor Risk' : '✅ Distributed Knowledge'}
                 </span>
             </td>
         </tr>
+         <tr>
+            <td>Product Reality (CPO)</td>
+            <td style="color:${agents.cpo?.product_health === 'Declining' ? 'var(--danger)' : 'var(--success)'}">${agents.cpo?.product_health}</td>
+            <td>
+                Adoption vs Pain
+                <span style="display:block; font-size:10px; color:var(--muted); margin-top:2px;">
+                     Issues: ${agents.cpo?.signals?.issue_pressure || 'N/A'} | Speed: ${agents.cpo?.signals?.maintainer_responsiveness || 'N/A'}
+                </span>
+            </td>
+        </tr>
         <tr>
-            <td>Financial</td>
+            <td>Financial (CFO)</td>
             <td style="color:${agents.cfo?.financial_mode === 'Distress' ? 'var(--danger)' : 'var(--success)'}">${agents.cfo?.financial_mode}</td>
             <td>Hiring & Spend Tones</td>
         </tr>
         <tr>
-            <td>Narrative</td>
+            <td>Narrative (CEO)</td>
             <td style="color:${agents.ceo?.health === 'Critical' ? 'var(--danger)' : 'var(--success)'}">${agents.ceo?.health}</td>
             <td>Strategy Drift / Contradiction</td>
         </tr>
