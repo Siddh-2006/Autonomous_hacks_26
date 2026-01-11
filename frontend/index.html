@@ -633,6 +633,13 @@
 
     <!-- LOGIC -->
     <script>
+        if (window.location.protocol === 'file:') {
+            alert("⚠️ STOP! \n\nYou are opening this file directly. This prevents the app from working (CORS Errors).\n\nPlease open http://127.0.0.1:8000 in your browser instead.");
+            document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#000;color:red;font-family:sans-serif;text-align:center;"><h1>⚠️ ACCESS ERROR</h1><p>Please open <a href="http://127.0.0.1:8000" style="color:#0ff">http://127.0.0.1:8000</a> to use this app.</p></div>';
+            throw new Error("Wrong protocol");
+        }
+    </script>
+    <script>
         // --- ANIMATED BG ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
