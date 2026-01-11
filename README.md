@@ -15,7 +15,7 @@ In today's market, "Truth" is fragmented.
 *   **High Latency**: Quarterly earnings happen every 90 days. **Strategy breaks weeks before the numbers do.**
 *   **Blindspots**: Financial analysts don't read GitHub commit logs.
 
-## ⚡ The Solution: 3 Autonomous Executive Agents
+## ⚡ The Solution: 4 Autonomous Executive Agents
 We built **Job-Specific Agents** that live on the internet, wake up autonomously, and perform rigorous professional work 24/7.
 
 | Agent | Role | Source of Truth | Core Question |
@@ -23,15 +23,16 @@ We built **Job-Specific Agents** that live on the internet, wake up autonomously
 | **🕵️‍♂️ CFO Agent** | **Forensic Auditor** | **Greenhouse / Earnings Q&A** | "Is the company cutting costs while claiming growth? Is management evading questions?" |
 | **♟️ CEO Agent** | **Strategic Sentinel** | **Google News / SEC Filings** | "Is the strategic narrative becoming defensive? Is there 'Strategy Drift' from 2 years ago?" |
 | **👨‍💻 CTO Agent** | **Tech Auditor** | **GitHub API** | "Is engineering velocity slowing? Is there a 'Bus Factor' risk (knowledge silo)?" |
+| **⚖️ CPO Agent** | **Product Auditor** | **GitHub Issues / App Store** | "Is the product actually working? Is there a gap between Marketing Hype and User Reality?" |
 
 ---
 
 ## 📚 Documentation (Deep Dives)
 Each agent is a complex system. Read their "Brain" logic here:
-*   [**👉 CFO Agent Guide**](CFO_AGENT_EXPLAINED.md) (Forensics & Evasion Detection)
-*   [**👉 CEO Agent Guide**](CEO_AGENT_EXPLAINED.md) (Strategy Drift & Vectors)
-*   [**👉 CTO Agent Guide**](CTO_AGENT_EXPLAINED.md) (Bus Factor & Velocity)
-*   [**☁️ Deployment Cheat Sheet**](docs/DEPLOYMENT_CHEAT_SHEET.md) (Railway.app Guide)
+*   [**👉 CFO Agent Guide**](docs/CFO_AGENT_EXPLAINED.md) (Forensics & Evasion Detection)
+*   [**👉 CEO Agent Guide**](docs/CEO_AGENT_EXPLAINED.md) (Strategy Drift & Vectors)
+*   [**👉 Board Agent Spec**](docs/BOARD_AGENT_MASTER_SPEC.md) (The 5 Core Risk Patterns)
+*   [**👉 Dashboard UX Spec**](docs/DASHBOARD_UX_SPEC.md) (The "Dark/Elite" Design System)
 
 ---
 
@@ -52,10 +53,12 @@ graph TD
         CFO[👮 CFO Agent]
         CEO[🧠 CEO Agent]
         CTO[👨‍💻 CTO Agent]
+        CPO[⚖️ CPO Agent]
         
         Greenhouse --> CFO
         GNews --> CEO
         GitHub --> CTO
+        GitHub --> CPO
     end
 
     subgraph "Tier 3: The Brain (Memory)"
@@ -66,16 +69,26 @@ graph TD
         CEO -->|Strategy Baseline| Vector
         
         CFO -->|Snapshots| SQL
-        CEO -->|Snapshots| SQL
         CTO -->|Snapshots| SQL
+        CPO -->|Snapshots| SQL
     end
 
-    subgraph "Tier 4: The Product"
-        Dashboard[📊 Premium Dark Grid Dashboard]
+    subgraph "Tier 4: The Experience"
+        Dashboard[📊 "Elite" Terminal Dashboard]
         API[⚡ FastAPI Backend]
         
         SQL --> API
         API --> Dashboard
+    end
+
+    subgraph "Tier 5: Automation & Alerts (Background)"
+        Cron[⏰ Cron Runner]
+        Detector[⚠️ Change Detector]
+        Notifier[🔔 Alert Dispatcher]
+        
+        Cron --> API
+        API --> Detector
+        Detector --> Notifier
     end
 ```
 
