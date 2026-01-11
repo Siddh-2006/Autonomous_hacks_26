@@ -120,7 +120,8 @@ def get_board_status():
         "agents": {
             "cfo": get_latest_cfo_snapshot(),
             "ceo": get_latest_ceo_snapshot(),
-            "cto": get_latest_cto_snapshot()
+            "cto": get_latest_cto_snapshot(),
+            "cpo": get_latest_cpo_snapshot()
         }
     }
 
@@ -131,10 +132,12 @@ def refresh_board():
     from backend.agents.cfo.agent import CFOAgent
     from backend.agents.ceo.agent import CEOAgent
     from backend.agents.cto.agent import CTOAgent
+    from backend.agents.cpo.agent import CPOAgent
     
     CFOAgent().analyze()
     CEOAgent().analyze()
     CTOAgent().analyze()
+    CPOAgent().analyze()
     
     # 2. Run Board
     board_agent = ExecutiveReasoningAgent()

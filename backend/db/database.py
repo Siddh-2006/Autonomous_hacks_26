@@ -184,6 +184,41 @@ def get_executive_history(limit=5):
     finally:
         conn.close()
 
+
+# --- CPO Functions ---
+def insert_cpo_snapshot(data):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO cpo_snapshots (
+            timestamp, product_health, severity, 
+            adoption_trend, issue_pressure, maintainer_responsiveness,
+            ecosystem_dependency, confidence, explanation
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        data.get('timestamp', datetime.now().isoformat()),
+        data.get('product_health'),
+        data.get('severity'),
+        data.get('signals', {}).get('adoption_trend'),
+        data.get('signals', {}).get('issue_pressure'),
+        data.get('signals', {}).get('maintainer_responsiveness'),
+        data.get('signals', {}).get('ecosystem_dependency'),
+        data.get('confidence'),
+        data.get('explanation')
+    ))
+    conn.commit()
+    conn.close()
+
+def get_latest_cpo_snapshot():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM cpo_snapshots ORDER BY timestamp DESC LIMIT 1')
+    row = c.fetchone()
+    conn.close()
+    if row:
+        return dict(row)
+    return None
+
 if __name__ == "__main__":
     init_db()
     print("Database initialized.")

@@ -1,4 +1,4 @@
-def evaluate_executive_risk(cfo_snapshot, cto_snapshot, ceo_snapshot):
+def evaluate_executive_risk(cfo_snapshot, cto_snapshot, ceo_snapshot, cpo_snapshot=None):
     """
     Deterministic Rule Engine for Cross-Agent Executive Reasoning.
     
@@ -19,9 +19,19 @@ def evaluate_executive_risk(cfo_snapshot, cto_snapshot, ceo_snapshot):
     cfo_mode = cfo_snapshot.get('financial_mode', 'Stable')
     cto_health = cto_snapshot.get('execution_health', 'Stable')
     ceo_health = ceo_snapshot.get('narrative_health', 'Stable')
+    cpo_health = cpo_snapshot.get('product_health', 'Healthy') if cpo_snapshot else 'Healthy'
     
     # 2. Apply Deterministic Rules (Ordered by Severity)
-    
+
+    # CRITICAL RISK: The "Reality Gap" (CEO says Growth, Product says Declining)
+    # This is the CPO's main job: Anchoring Hype.
+    if ceo_health == 'Strong' and cpo_health == 'Declining':
+        return {
+            'overall_risk': 'Critical',
+            'reason': "Reality Gap: CEO claims strong growth, but Product Health is declining (User churn/Neglect). High probability of narrative fabrication.",
+            'confidence': 0.95
+        }
+
     # CRITICAL RISK: Execution Collapse + Financial Distress
     if cto_health == 'Declining' and cfo_mode == 'Cost-Control':
         return {

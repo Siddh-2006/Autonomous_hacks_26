@@ -42,6 +42,19 @@ CREATE TABLE IF NOT EXISTS cto_snapshots (
     explanation TEXT
 );
 
+CREATE TABLE IF NOT EXISTS cpo_snapshots (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_health TEXT, -- Healthy, Stressed, Declining
+    severity TEXT,
+    adoption_trend TEXT,
+    issue_pressure TEXT,
+    maintainer_responsiveness TEXT,
+    ecosystem_dependency TEXT,
+    confidence REAL,
+    explanation TEXT,
+    timestamp TEXT
+);
+
 CREATE TABLE IF NOT EXISTS executive_snapshots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp TEXT,
