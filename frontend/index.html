@@ -4,685 +4,621 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Auto-Diligence | Autonomous Investor System</title>
+    <title>AUTO-DILIGENCE | CROSS-AGENT INTELLIGENCE</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --bg: #0b0f14;
-            --panel: #121824;
-            --panel-2: #0f1420;
-            --card-hover: #1a2234;
-            --accent: #5eead4;
-            --danger: #fb7185;
-            --warning: #facc15;
-            --success: #22c55e;
-            --text: #e5e7eb;
-            --muted: #9ca3af;
-            --border: #1f2937;
+            --bg-color: #030507;
+            --glass-panel: rgba(16, 20, 28, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-primary: #00f2fe;
+            --accent-secondary: #4facfe;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --danger: #ff4d4d;
+            --warning: #ffb86c;
+            --success: #2ecc71;
+            --font-ui: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
 
         * {
             box-sizing: border-box;
-            transition: all 0.2s ease;
         }
 
         body {
             margin: 0;
-            font-family: 'Inter', system-ui, sans-serif;
-            background: radial-gradient(1200px 600px at 20% -10%, #111827, transparent), var(--bg);
-            color: var(--text);
-            height: 100vh;
+            font-family: var(--font-ui);
+            background-color: var(--bg-color);
+            color: var(--text-main);
             overflow: hidden;
+            /* For canvas background */
         }
 
-        .layout {
+        /* --- BACKGROUND MESH --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        /* --- LAYOUT --- */
+        .app-container {
             display: grid;
-            grid-template-columns: 260px 1fr;
+            grid-template-columns: 280px 1fr;
             height: 100vh;
+            backdrop-filter: blur(0px);
+            /* Performance fallback */
         }
 
-        /* Sidebar */
+        /* --- SIDEBAR --- */
         .sidebar {
-            background: linear-gradient(180deg, #0c111b, #0a0e17);
-            border-right: 1px solid var(--border);
-            padding: 24px 18px;
+            background: rgba(5, 7, 10, 0.85);
+            border-right: 1px solid var(--glass-border);
+            padding: 30px 20px;
+            backdrop-filter: blur(20px);
             display: flex;
             flex-direction: column;
         }
 
-        .logo {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 32px;
+        .brand {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            color: var(--accent-primary);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .brand-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .logo span {
-            background: rgba(94, 234, 212, 0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .nav {
-            flex: 1;
+        .nav-item.active {
+            background: rgba(0, 242, 254, 0.05);
+            border-color: rgba(0, 242, 254, 0.2);
+            color: var(--accent-primary);
         }
 
-        .nav a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--muted);
-            padding: 12px 14px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-
-        .nav a:hover {
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--text);
-        }
-
-        .nav a.active {
-            background: var(--panel);
-            color: var(--text);
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Main */
-        .main {
-            padding: 32px;
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            padding: 40px;
             overflow-y: auto;
-            scroll-behavior: smooth;
+            position: relative;
         }
 
-        .header {
+        .top-bar {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
+            align-items: flex-start;
+            margin-bottom: 40px;
         }
 
-        .header h1 {
-            font-size: 24px;
-            margin: 0;
-            font-weight: 600;
-            letter-spacing: -0.02em;
+        h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin: 0 0 8px 0;
+            background: linear-gradient(90deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .status-badge {
-            display: flex;
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .status-pill {
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-size: 13px;
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--success);
             padding: 6px 12px;
-            border-radius: 99px;
-            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 20px;
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            color: var(--success);
+            font-size: 11px;
+            font-family: var(--font-mono);
+            letter-spacing: 0.05em;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
+        .pulse {
+            width: 6px;
+            height: 6px;
+            background: currentColor;
             border-radius: 50%;
-            box-shadow: 0 0 8px var(--success);
-            animation: pulse 2s infinite;
+            animation: pulse-anim 2s infinite;
         }
 
-        @keyframes pulse {
+        @keyframes pulse-anim {
             0% {
                 opacity: 1;
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
             }
 
-            50% {
+            70% {
                 opacity: 0.5;
+                box-shadow: 0 0 0 6px rgba(46, 204, 113, 0);
             }
 
             100% {
                 opacity: 1;
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
             }
         }
 
-        .page {
-            display: none;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .grid {
+        /* --- GRID SYSTEM --- */
+        .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 20px;
+            gap: 24px;
         }
 
         .card {
-            background: linear-gradient(180deg, var(--panel), var(--panel-2));
-            border: 1px solid var(--border);
-            border-radius: 16px;
+            background: var(--glass-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
             padding: 24px;
+            backdrop-filter: blur(12px);
             position: relative;
             overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent), transparent);
-            opacity: 0.5;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border-color: rgba(94, 234, 212, 0.2);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
-        .card h3 {
-            margin-top: 0;
-            font-size: 12px;
-            color: var(--muted);
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        .thesis-text {
-            font-size: 16px;
-            line-height: 1.6;
-            color: var(--text);
-        }
-
-        .risk-score {
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--text);
-            letter-spacing: -0.03em;
-        }
-
-        .risk-label {
-            font-size: 14px;
-            margin-top: 4px;
-            font-weight: 500;
-        }
-
-        .signal-list {
-            display: grid;
-            gap: 12px;
-        }
-
-        .signal {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .signal:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .signal-agent {
-            font-weight: 600;
-            color: var(--accent);
-            margin-right: 12px;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-
-        .timeline .event {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .event:last-child {
-            border-bottom: none;
-        }
-
-        .event-time {
-            font-size: 12px;
-            color: var(--muted);
-            min-width: 80px;
-        }
-
-        .event-body {
-            flex: 1;
-            margin-left: 12px;
-        }
-
-        .tag {
-            padding: 4px 10px;
-            border-radius: 999px;
+        .card-header {
+            font-family: var(--font-mono);
             font-size: 11px;
-            font-weight: 600;
             text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .tag.red {
-            background: rgba(251, 113, 133, 0.15);
+        /* --- TYPOGRAPHY UTILS --- */
+        .metric-big {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .metric-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* --- RISK COLORS --- */
+        .color-critical {
             color: var(--danger);
+            text-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
         }
 
-        .tag.green {
-            background: rgba(34, 197, 94, 0.15);
-            color: var(--success);
-        }
-
-        .tag.yellow {
-            background: rgba(250, 204, 21, 0.15);
+        .color-high {
             color: var(--warning);
         }
 
-        table {
+        .color-medium {
+            color: #f1c40f;
+        }
+
+        .color-low {
+            color: var(--success);
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+        }
+
+        /* --- AGENT FEED --- */
+        .agent-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .feed-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            border-left: 2px solid var(--glass-border);
+        }
+
+        .feed-agent {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--accent-secondary);
+            margin-right: 8px;
+        }
+
+        /* --- TERMINAL TABLE --- */
+        .terminal-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        th {
+        .terminal-table th {
             text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-            color: var(--muted);
+            padding: 12px 16px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
             font-weight: 500;
-            font-size: 12px;
-            text-transform: uppercase;
+            border-bottom: 1px solid var(--glass-border);
         }
 
-        td {
-            padding: 16px 12px;
-            border-bottom: 1px solid var(--border);
+        .terminal-table td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         }
 
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            color: var(--muted);
-            font-size: 12px;
-            opacity: 0.6;
-        }
-
-        .log-entry {
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: var(--muted);
-            margin-bottom: 4px;
-        }
-
-        /* Chart Container */
-        .chart-container {
-            position: relative;
-            height: 200px;
+        /* --- LOADING OVERLAY --- */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            background: #030507;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            transition: opacity 0.5s;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .loader-content {
+            text-align: center;
         }
 
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
+        .scan-line {
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            animation: scan 1.5s infinite;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
+        @keyframes scan {
+            0% {
+                transform: translateX(-100%);
+            }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--muted);
+            100% {
+                transform: translateX(100%);
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="layout">
+
+    <!-- CANVAS BG -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- LOADING SCREEN -->
+    <div id="loader">
+        <div class="loader-content">
+            <div style="font-family: var(--font-mono); color: var(--accent-primary); margin-bottom: 10px;">INITIALIZING
+                SWARM...</div>
+            <div class="scan-line"></div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
         <aside class="sidebar">
-            <div class="logo">Auto-Diligence <span>v2.0</span></div>
-            <nav class="nav">
-                <a class="active" onclick="showPage('overview')">Overview</a>
-                <a onclick="showPage('signals')">Signals</a>
-                <a onclick="showPage('risk')">Risk Engine</a>
-                <a onclick="showPage('thesis')">Thesis History</a>
-                <a onclick="showPage('agents')">Agent Logs</a>
-            </nav>
+            <div class="brand">
+                <div class="brand-dot"></div>
+                AUTO-DILIGENCE
+            </div>
+
+            <div class="nav-item active">
+                <span>⚡</span> DASHBOARD
+            </div>
+            <div class="nav-item">
+                <span>🧬</span> AGENT DNA
+            </div>
+            <div class="nav-item">
+                <span>📜</span> HISTORY
+            </div>
+            <div class="nav-item">
+                <span>⚙️</span> SYSTEM
+            </div>
         </aside>
 
-        <main class="main">
-            <div class="header">
-                <h1>Investment Intelligence</h1>
-                <div class="status-badge">
-                    <div class="status-dot"></div> Live Monitoring
+        <!-- MAIN -->
+        <main class="main-content">
+
+            <div class="top-bar">
+                <div>
+                    <h1>Executive Intelligence</h1>
+                    <div class="subtitle">AUTONOMOUS MULTI-AGENT REASONING ENGINE</div>
+                </div>
+                <div class="status-pill">
+                    <div class="pulse"></div>
+                    SYSTEM ACTIVE
                 </div>
             </div>
 
-            <!-- OVERVIEW -->
-            <section id="overview" class="page active">
-                <div class="grid">
-                    <!-- Live Thesis -->
-                    <div class="card" style="grid-column:span 8">
-                        <h3>Live Investment Thesis (Generated by AI)</h3>
-                        <div id="live-thesis" class="thesis-text">Loading thesis...</div>
-                    </div>
+            <!-- GRID -->
+            <div class="dashboard-grid">
 
-                    <!-- Overall Risk -->
-                    <div class="card" style="grid-column:span 4; text-align: center;">
-                        <h3>Overall Risk Level</h3>
-                        <div id="risk-score" class="risk-score">--</div>
-                        <div id="risk-label" class="risk-label">Calculating...</div>
+                <!-- OVERALL VERDICT -->
+                <div class="card" style="grid-column: span 8;">
+                    <div class="card-header">
+                        LIVE INVESTMENT THESIS (BOARD)
+                        <span id="risk-type" style="color: var(--accent-secondary)">ANALYZING...</span>
                     </div>
-
-                    <!-- Key Stats Row -->
-                    <div class="card" style="grid-column:span 4">
-                        <h3>CFO Financial Mode</h3>
-                        <div id="cfo-mode" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">--</div>
-                        <!-- Mini Chart Placeholder -->
-                        <div style="font-size: 11px; color: var(--muted);">Based on hiring velocity</div>
-                    </div>
-                    <div class="card" style="grid-column:span 4">
-                        <h3>CEO Strategy Drift</h3>
-                        <div id="ceo-drift" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">--</div>
-                        <div style="font-size: 11px; color: var(--muted);">Semantic distance from baseline</div>
-                    </div>
-                    <div class="card" style="grid-column:span 4">
-                        <h3>CTO Velocity</h3>
-                        <div id="cto-health" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">--</div>
-                        <div style="font-size: 11px; color: var(--muted);">Commit cadence consistency</div>
-                    </div>
-
-                    <!-- CPO CARD (NEW) -->
-                    <div class="card" style="grid-column:span 4">
-                        <h3>CPO Product Reality</h3>
-                        <div id="cpo-health" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">--</div>
-                        <div style="font-size: 11px; color: var(--muted);">Adoption vs Pain (Truth Check)</div>
-                    </div>
-
-                    <!-- VISUALS: History Chart -->
-                    <div class="card" style="grid-column:span 12">
-                        <h3>Risk Trend Analysis (Six Month Window)</h3>
-                        <div class="chart-container">
-                            <canvas id="riskChart"></canvas>
-                        </div>
+                    <div id="thesis-text" style="font-size: 18px; line-height: 1.6; color: #fff;">
+                        Connecting to Neural Core...
                     </div>
                 </div>
-            </section>
 
-            <!-- SIGNALS -->
-            <section id="signals" class="page">
-                <div class="card">
-                    <h3>Active Agent Signals</h3>
-                    <div id="signal-container" class="signal-list">
-                        <!-- Populated by JS -->
-                    </div>
+                <!-- RISK SCORE -->
+                <div class="card"
+                    style="grid-column: span 4; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                    <div class="card-header" style="width: 100%;">RISK EXPOSURE</div>
+                    <div id="risk-display" class="metric-big" style="font-size: 48px;">--</div>
+                    <div id="confidence-display" class="metric-sub"
+                        style="font-family: var(--font-mono); color: var(--accent-secondary);">CONFIDENCE: --%</div>
                 </div>
-            </section>
 
-            <!-- RISK ENGINE -->
-            <section id="risk" class="page">
-                <div class="card">
-                    <h3>Risk Factor Breakdown</h3>
-                    <table>
+                <!-- 4 AGENT METRICS -->
+                <div class="card" style="grid-column: span 3;">
+                    <div class="card-header">CFO (FINANCE)</div>
+                    <div id="cfo-val" class="metric-big">--</div>
+                    <div class="metric-sub">Capital Allocation Mode</div>
+                </div>
+
+                <div class="card" style="grid-column: span 3;">
+                    <div class="card-header">CEO (STRATEGY)</div>
+                    <div id="ceo-val" class="metric-big">--</div>
+                    <div class="metric-sub">Narrative Sentiment</div>
+                </div>
+
+                <div class="card" style="grid-column: span 3;">
+                    <div class="card-header">CTO (EXECUTION)</div>
+                    <div id="cto-val" class="metric-big">--</div>
+                    <div class="metric-sub">Engineering Health</div>
+                </div>
+
+                <div class="card" style="grid-column: span 3;">
+                    <div class="card-header">CPO (REALITY)</div>
+                    <div id="cpo-val" class="metric-big">--</div>
+                    <div class="metric-sub">Product/Market Fit</div>
+                </div>
+
+                <!-- TABLE -->
+                <div class="card" style="grid-column: span 8;">
+                    <div class="card-header">CROSS-AGENT VALIDATION MATRIX</div>
+                    <table class="terminal-table">
                         <thead>
                             <tr>
-                                <th>Category</th>
-                                <th>Status</th>
-                                <th>Driver / Evidence</th>
+                                <th>AGENT LAYER</th>
+                                <th>STATUS</th>
+                                <th>PRIMARY SIGNAL</th>
                             </tr>
                         </thead>
-                        <tbody id="risk-table">
-                            <!-- JS populated -->
+                        <tbody id="validation-table">
+                            <!-- JS Injected -->
                         </tbody>
                     </table>
                 </div>
-            </section>
 
-            <!-- THESIS HISTORY -->
-            <section id="thesis" class="page">
-                <div class="card">
-                    <h3>Thesis Evolution Timeline</h3>
-                    <div id="timeline-container" class="timeline">
-                        <!-- JS populated -->
+                <!-- FEED -->
+                <div class="card" style="grid-column: span 4;">
+                    <div class="card-header">LIVE INTELLIGENCE FEED</div>
+                    <div class="agent-feed" id="live-feed">
+                        <!-- JS Injected -->
                     </div>
                 </div>
-            </section>
 
-            <!-- AGENT LOGS -->
-            <section id="agents" class="page">
-                <div class="card">
-                    <h3>Real-Time Agent Logs</h3>
-                    <div id="logs-container" style="max-height: 400px; overflow-y: auto;">
-                        <!-- JS populated -->
-                    </div>
-                </div>
-            </section>
-
-            <footer>
-                Autonomous Due-Diligence System • Powered by Multi-Agent Vector Forensics
-            </footer>
+            </div>
         </main>
     </div>
 
+    <!-- LOGIC -->
     <script>
-        // --- UI Logic ---
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+        // --- ANIMATED BG ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initParticles();
         }
 
-        // --- Charts Init ---
-        let riskChartCtx = document.getElementById('riskChart').getContext('2d');
-        let riskChart = new Chart(riskChartCtx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Risk Confidence Score',
-                    data: [],
-                    borderColor: '#5eead4',
-                    backgroundColor: 'rgba(94, 234, 212, 0.1)',
-                    borderWidth: 2,
-                    pointBackgroundColor: '#0b0f14',
-                    pointBorderColor: '#5eead4',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, max: 1.0, grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } },
-                    x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+        function initParticles() {
+            particles = [];
+            const count = Math.floor(width * height / 15000);
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+                if (p.y > height) p.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Connect
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dist = Math.hypot(p2.x - p.x, p2.y - p.y);
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
                 }
             }
-        });
+            requestAnimationFrame(draw);
+        }
 
+        window.addEventListener('resize', resize);
+        resize();
+        draw();
 
-        // --- Data Logic (Real-Time) ---
+        // --- DATA LOGIC ---
         const API_URL = "/api/board/status";
 
-        async function fetchData() {
+        async function init() {
+            // Remove loader
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = 0;
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+            }, 1000);
+
+            poll();
+            setInterval(poll, 5000);
+        }
+
+        async function poll() {
             try {
                 const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("API Error");
                 const data = await res.json();
                 updateUI(data);
-            } catch (e) {
-                console.log("Polling error:", e);
-            }
+            } catch (e) { console.error("Sync Error", e); }
         }
 
         function updateUI(data) {
             const v = data.verdict || {};
             const agents = data.agents || {};
-            const history = data.history || [];
 
-            // 1. Overview
-            document.getElementById('live-thesis').innerText = v.reason || "No thesis generated yet.";
+            // Thesis
+            document.getElementById('thesis-text').innerText = v.reason || "Awaiting Analysis...";
+            document.getElementById('risk-type').innerText = (v.risk_type || "Mixed").toUpperCase();
 
-            const risk = v.overall_risk || "Unknown";
-            const elRisk = document.getElementById('risk-score');
-            elRisk.innerText = risk.toUpperCase();
+            // Risk Score
+            const riskEl = document.getElementById('risk-display');
+            riskEl.innerText = (v.overall_risk || "--").toUpperCase();
 
-            // Color coding
-            if (risk === 'Critical' || risk === 'High') { elRisk.style.color = 'var(--danger)'; riskChart.data.datasets[0].borderColor = '#fb7185'; }
-            else if (risk === 'Medium') { elRisk.style.color = 'var(--warning)'; riskChart.data.datasets[0].borderColor = '#facc15'; }
-            else { elRisk.style.color = 'var(--success)'; riskChart.data.datasets[0].borderColor = '#22c55e'; }
+            // Color Class logic
+            const risk = (v.overall_risk || "").toLowerCase();
+            riskEl.className = "metric-big " + (risk === 'critical' || risk === 'high' ? 'color-critical' : risk === 'medium' ? 'color-medium' : 'color-low');
 
-            document.getElementById('risk-label').innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}%`;
+            document.getElementById('confidence-display').innerText = `CONFIDENCE: ${((v.confidence || 0) * 100).toFixed(0)}%`;
 
-            // Agent Stats
-            document.getElementById('cfo-mode').innerText = agents.cfo ? agents.cfo.financial_mode : "N/A";
-            document.getElementById('ceo-drift').innerText = agents.ceo ? agents.ceo.health : "N/A";
-            document.getElementById('cto-health').innerText = agents.cto ? agents.cto.execution_health : "N/A";
-            document.getElementById('cpo-health').innerText = agents.cpo ? agents.cpo.product_health : "N/A";
+            // Agent Metrics
+            const setVal = (id, val, badValues) => {
+                const el = document.getElementById(id);
+                el.innerText = val || "--";
+                if (badValues.includes(val)) el.className = "metric-big color-critical";
+                else el.className = "metric-big color-low";
+            };
 
-            // 2. Signals list (Updated for CPO)
-            const signalsDiv = document.getElementById('signal-container');
-            signalsDiv.innerHTML = '';
+            setVal('cfo-val', agents.cfo?.financial_mode, ['Distress', 'Cost-Control']);
+            setVal('ceo-val', agents.ceo?.narrative_health, ['Weakening', 'Critical']);
+            setVal('cto-val', agents.cto?.execution_health, ['Declining', 'Critical']);
+            setVal('cpo-val', agents.cpo?.product_health, ['Declining', 'Stressed']);
 
-            const signalList = [
-                { name: 'CFO Agent', msg: agents.cfo ? agents.cfo.explanation : "No data" },
-                { name: 'CEO Agent', msg: agents.ceo ? agents.ceo.explanation : "No data" },
-                { name: 'CTO Agent', msg: agents.cto ? agents.cto.explanation : "No data" },
-                { name: 'CPO Agent', msg: agents.cpo ? agents.cpo.explanation : "No data" }
-            ];
-
-            signalList.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'signal';
-                div.innerHTML = `<span class="signal-agent">${s.name}</span> <span>${s.msg}</span>`;
-                signalsDiv.appendChild(div);
-            });
-
-            // 3. Risk Table (Added CPO Row)
-            const riskTable = document.getElementById('risk-table');
-            riskTable.innerHTML = `
-        <tr>
-            <td>Execution (CTO)</td>
-            <td style="color:${agents.cto?.execution_health === 'Declining' ? 'var(--danger)' : 'var(--success)'}">${agents.cto?.execution_health}</td>
-            <td>
-                Activity & Bus Factor 
-                <span style="display:block; font-size:10px; color:var(--muted); margin-top:2px;">
-                    ${agents.cto?.bus_factor_risk ? '⚠️ High Bus Factor Risk' : '✅ Distributed Knowledge'}
-                </span>
-            </td>
-        </tr>
-         <tr>
-            <td>Product Reality (CPO)</td>
-            <td style="color:${agents.cpo?.product_health === 'Declining' ? 'var(--danger)' : 'var(--success)'}">${agents.cpo?.product_health}</td>
-            <td>
-                Adoption vs Pain
-                <span style="display:block; font-size:10px; color:var(--muted); margin-top:2px;">
-                     Issues: ${agents.cpo?.issue_pressure || 'N/A'} | Speed: ${agents.cpo?.maintainer_responsiveness || 'N/A'}
-                </span>
-            </td>
-        </tr>
-        <tr>
-            <td>Financial (CFO)</td>
-            <td style="color:${agents.cfo?.financial_mode === 'Distress' ? 'var(--danger)' : 'var(--success)'}">${agents.cfo?.financial_mode}</td>
-            <td>Hiring & Spend Tones</td>
-        </tr>
-        <tr>
-            <td>Narrative (CEO)</td>
-            <td style="color:${agents.ceo?.health === 'Critical' ? 'var(--danger)' : 'var(--success)'}">${agents.ceo?.health}</td>
-            <td>Strategy Drift / Contradiction</td>
-        </tr>
-    `;
-
-            // 4. Timeline
-            const timelineDiv = document.getElementById('timeline-container');
-            timelineDiv.innerHTML = '';
-
-            // Update Chart Data based on History
-            if (history.length > 0) {
-                // Reverse because history comes DESC (newest first), but charts need ASC (oldest first)
-                const sortedHistory = [...history].reverse();
-
-                const labels = sortedHistory.map(h => new Date(h.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
-                const scores = sortedHistory.map(h => h.confidence); // Visualization confidence as 'risk magnitude' proxy or map Risk Level to 0-1
-
-                riskChart.data.labels = labels;
-                riskChart.data.datasets[0].data = scores;
-                riskChart.update();
-
-                history.forEach(h => {
-                    const div = document.createElement('div');
-                    div.className = 'event';
-                    const riskColor = h.overall_risk === 'High' ? 'red' : (h.overall_risk === 'Medium' ? 'yellow' : 'green');
-                    div.innerHTML = `
-                <div class="event-time">${new Date(h.timestamp).toLocaleDateString()}</div>
-                <div class="event-body">${h.summary || h.reason}</div>
-                <span class="tag ${riskColor}">${h.overall_risk}</span>
+            // Table
+            const table = document.getElementById('validation-table');
+            table.innerHTML = `
+                <tr>
+                    <td style="color:var(--accent-primary)">STRATEGY (CEO)</td>
+                    <td>${agents.ceo?.narrative_health || '--'}</td>
+                    <td style="font-family:var(--font-mono); color:var(--text-muted)">Sentiment Analysis (Google News)</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--accent-primary)">EXECUTION (CTO)</td>
+                    <td>${agents.cto?.execution_health || '--'}</td>
+                    <td style="font-family:var(--font-mono); color:var(--text-muted)">GitHub Velocity & Consistency</td>
+                </tr>
+                 <tr>
+                    <td style="color:var(--accent-primary)">PRODUCT (CPO)</td>
+                    <td>${agents.cpo?.product_health || '--'}</td>
+                    <td style="font-family:var(--font-mono); color:var(--text-muted)">Adoption vs Complaints Ratio</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--accent-primary)">FINANCE (CFO)</td>
+                    <td>${agents.cfo?.financial_mode || '--'}</td>
+                    <td style="font-family:var(--font-mono); color:var(--text-muted)">Hiring Trends (Greenhouse)</td>
+                </tr>
             `;
-                    timelineDiv.appendChild(div);
-                });
-            } else {
-                timelineDiv.innerHTML = '<div class="event">No history recorded yet.</div>';
-            }
 
-            // 5. Logs (Simulated from signals)
-            const logsDiv = document.getElementById('logs-container');
-            logsDiv.innerHTML = '';
-            const updates = [
-                { src: 'SYSTEM', msg: `Board analysis complete. Risk: ${risk}` },
-                { src: 'CFO', msg: `Processed job items. Verdict: ${agents.cfo?.financial_mode}` },
-                { src: 'CEO', msg: `News scan complete. Narrative: ${agents.ceo?.health}` }
-            ];
-            updates.forEach(u => {
-                const d = document.createElement('div');
-                d.className = 'log-entry';
-                d.innerText = `[${new Date().toLocaleTimeString()}] [${u.src}] ${u.msg}`;
-                logsDiv.appendChild(d);
-            });
+            // Feed
+            const feed = document.getElementById('live-feed');
+            feed.innerHTML = `
+                <div class="feed-item"><span class="feed-agent">BOARD</span>${v.summary || v.reason}</div>
+                <div class="feed-item"><span class="feed-agent">CPO</span>${agents.cpo?.explanation || 'No Signal'}</div>
+                <div class="feed-item"><span class="feed-agent">CTO</span>${agents.cto?.explanation || 'No Signal'}</div>
+                <div class="feed-item"><span class="feed-agent">CEO</span>${agents.ceo?.explanation || 'No Signal'}</div>
+            `;
         }
 
-        // Initial Load & Polling (Real-Time)
-        fetchData();
-        setInterval(fetchData, 5000); // 5 seconds poll
+        init();
 
     </script>
 </body>
