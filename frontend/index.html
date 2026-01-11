@@ -314,11 +314,6 @@
 
         .loader-content {
             text-align: center;
-        }
-
-        .scan-line {
-            width: 200px;
-            height: 2px;
             background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
             animation: scan 1.5s infinite;
         }
@@ -331,6 +326,83 @@
             100% {
                 transform: translateX(100%);
             }
+        }
+
+        /* --- VIEW TRANSITIONS --- */
+        .view-section {
+            display: none;
+            animation: fade-in 0.3s ease-out;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- CYBER BUTTON --- */
+        .cyber-btn {
+            background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary));
+            border: none;
+            padding: 10px 24px;
+            color: #000;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .cyber-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.6);
+        }
+
+        .cyber-btn:active {
+            transform: scale(0.95);
+        }
+
+        .cyber-btn .btn-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tag.red {
+            background: rgba(251, 113, 133, 0.15);
+            color: var(--danger);
+        }
+
+        .tag.green {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+        }
+
+        .tag.yellow {
+            background: rgba(250, 204, 21, 0.15);
+            color: var(--warning);
         }
     </style>
 </head>
@@ -359,16 +431,16 @@
                 AUTO-DILIGENCE
             </div>
 
-            <div class="nav-item active">
+            <div class="nav-item active" onclick="switchView('dashboard', this)">
                 <span>⚡</span> DASHBOARD
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="switchView('dna', this)">
                 <span>🧬</span> AGENT DNA
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="switchView('history', this)">
                 <span>📜</span> HISTORY
             </div>
-            <div class="nav-item">
+            <div class="nav-item" onclick="switchView('system', this)">
                 <span>⚙️</span> SYSTEM
             </div>
         </aside>
@@ -381,86 +453,149 @@
                     <h1>Executive Intelligence</h1>
                     <div class="subtitle">AUTONOMOUS MULTI-AGENT REASONING ENGINE</div>
                 </div>
-                <div class="status-pill">
-                    <div class="pulse"></div>
-                    SYSTEM ACTIVE
+
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <!-- INTERACTIVE SCAN BUTTON -->
+                    <button class="cyber-btn" onclick="triggerScan()">
+                        <span class="btn-text">INITIATE SCAN</span>
+                        <span class="btn-glitch"></span>
+                    </button>
+
+                    <div class="status-pill">
+                        <div class="pulse"></div>
+                        SYSTEM ACTIVE
+                    </div>
                 </div>
             </div>
 
-            <!-- GRID -->
-            <div class="dashboard-grid">
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="view-section active">
+                <div class="dashboard-grid">
 
-                <!-- OVERALL VERDICT -->
-                <div class="card" style="grid-column: span 8;">
-                    <div class="card-header">
-                        LIVE INVESTMENT THESIS (BOARD)
-                        <span id="risk-type" style="color: var(--accent-secondary)">ANALYZING...</span>
+                    <!-- OVERALL VERDICT -->
+                    <div class="card" style="grid-column: span 8;">
+                        <div class="card-header">
+                            LIVE INVESTMENT THESIS (BOARD)
+                            <span id="risk-type" style="color: var(--accent-secondary)">ANALYZING...</span>
+                        </div>
+                        <div id="thesis-text" style="font-size: 18px; line-height: 1.6; color: #fff;">
+                            Connecting to Neural Core...
+                        </div>
                     </div>
-                    <div id="thesis-text" style="font-size: 18px; line-height: 1.6; color: #fff;">
-                        Connecting to Neural Core...
+
+                    <!-- RISK SCORE -->
+                    <div class="card"
+                        style="grid-column: span 4; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                        <div class="card-header" style="width: 100%;">RISK EXPOSURE</div>
+                        <div id="risk-display" class="metric-big" style="font-size: 48px;">--</div>
+                        <div id="confidence-display" class="metric-sub"
+                            style="font-family: var(--font-mono); color: var(--accent-secondary);">CONFIDENCE: --%</div>
                     </div>
-                </div>
 
-                <!-- RISK SCORE -->
-                <div class="card"
-                    style="grid-column: span 4; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-                    <div class="card-header" style="width: 100%;">RISK EXPOSURE</div>
-                    <div id="risk-display" class="metric-big" style="font-size: 48px;">--</div>
-                    <div id="confidence-display" class="metric-sub"
-                        style="font-family: var(--font-mono); color: var(--accent-secondary);">CONFIDENCE: --%</div>
-                </div>
+                    <!-- 4 AGENT METRICS -->
+                    <div class="card" style="grid-column: span 3;">
+                        <div class="card-header">CFO (FINANCE)</div>
+                        <div id="cfo-val" class="metric-big">--</div>
+                        <div class="metric-sub">Capital Allocation Mode</div>
+                    </div>
 
-                <!-- 4 AGENT METRICS -->
-                <div class="card" style="grid-column: span 3;">
-                    <div class="card-header">CFO (FINANCE)</div>
-                    <div id="cfo-val" class="metric-big">--</div>
-                    <div class="metric-sub">Capital Allocation Mode</div>
-                </div>
+                    <div class="card" style="grid-column: span 3;">
+                        <div class="card-header">CEO (STRATEGY)</div>
+                        <div id="ceo-val" class="metric-big">--</div>
+                        <div class="metric-sub">Narrative Sentiment</div>
+                    </div>
 
-                <div class="card" style="grid-column: span 3;">
-                    <div class="card-header">CEO (STRATEGY)</div>
-                    <div id="ceo-val" class="metric-big">--</div>
-                    <div class="metric-sub">Narrative Sentiment</div>
-                </div>
+                    <div class="card" style="grid-column: span 3;">
+                        <div class="card-header">CTO (EXECUTION)</div>
+                        <div id="cto-val" class="metric-big">--</div>
+                        <div class="metric-sub">Engineering Health</div>
+                    </div>
 
-                <div class="card" style="grid-column: span 3;">
-                    <div class="card-header">CTO (EXECUTION)</div>
-                    <div id="cto-val" class="metric-big">--</div>
-                    <div class="metric-sub">Engineering Health</div>
-                </div>
+                    <div class="card" style="grid-column: span 3;">
+                        <div class="card-header">CPO (REALITY)</div>
+                        <div id="cpo-val" class="metric-big">--</div>
+                        <div class="metric-sub">Product/Market Fit</div>
+                    </div>
 
-                <div class="card" style="grid-column: span 3;">
-                    <div class="card-header">CPO (REALITY)</div>
-                    <div id="cpo-val" class="metric-big">--</div>
-                    <div class="metric-sub">Product/Market Fit</div>
-                </div>
+                    <!-- TABLE -->
+                    <div class="card" style="grid-column: span 8;">
+                        <div class="card-header">CROSS-AGENT VALIDATION MATRIX</div>
+                        <table class="terminal-table">
+                            <thead>
+                                <tr>
+                                    <th>AGENT LAYER</th>
+                                    <th>STATUS</th>
+                                    <th>PRIMARY SIGNAL</th>
+                                </tr>
+                            </thead>
+                            <tbody id="validation-table">
+                                <!-- JS Injected -->
+                            </tbody>
+                        </table>
+                    </div>
 
-                <!-- TABLE -->
-                <div class="card" style="grid-column: span 8;">
-                    <div class="card-header">CROSS-AGENT VALIDATION MATRIX</div>
-                    <table class="terminal-table">
-                        <thead>
-                            <tr>
-                                <th>AGENT LAYER</th>
-                                <th>STATUS</th>
-                                <th>PRIMARY SIGNAL</th>
-                            </tr>
-                        </thead>
-                        <tbody id="validation-table">
+                    <!-- FEED -->
+                    <div class="card" style="grid-column: span 4;">
+                        <div class="card-header">LIVE INTELLIGENCE FEED</div>
+                        <div class="agent-feed" id="live-feed">
                             <!-- JS Injected -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- FEED -->
-                <div class="card" style="grid-column: span 4;">
-                    <div class="card-header">LIVE INTELLIGENCE FEED</div>
-                    <div class="agent-feed" id="live-feed">
-                        <!-- JS Injected -->
+                        </div>
                     </div>
                 </div>
-
             </div>
+
+            <!-- VIEW: AGENT DNA -->
+            <div id="view-dna" class="view-section">
+                <div class="dashboard-grid">
+                    <div class="card" style="grid-column: span 12;">
+                        <div class="card-header">AGENT PSYCHOLOGY & RULES</div>
+                        <div
+                            style="font-family: var(--font-mono); font-size: 14px; line-height: 1.8; color: var(--text-muted);">
+                            <span style="color: var(--accent-primary)">[CEO AGENT]</span> Analysis of strategic drift
+                            vs public narrative.<br>
+                            <span style="color: var(--accent-secondary)">[CFO AGENT]</span> Detection of financial
+                            distress via hiring patterns.<br>
+                            <span style="color: var(--danger)">[CTO AGENT]</span> "Zombie Company" detection via commit
+                            velocity.<br>
+                            <span style="color: var(--warning)">[CPO AGENT]</span> "Reality Gap" analysis (Hype vs
+                            Usage).<br>
+                            <br>
+                            <span style="color: #fff">BOARD LOGIC:</span> "Companies don't fail because of one problem
+                            — they fail because leadership ignores misalignment."
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: HISTORY -->
+            <div id="view-history" class="view-section">
+                <div class="dashboard-grid">
+                    <div class="card" style="grid-column: span 12;">
+                        <div class="card-header">INVESTMENT MEMO ARCHIVE</div>
+                        <div id="history-list" class="agent-feed">
+                            <!-- Populated by JS -->
+                            <div class="feed-item">Fetching Archive...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SYSTEM -->
+            <div id="view-system" class="view-section">
+                <div class="dashboard-grid">
+                    <div class="card" style="grid-column: span 6;">
+                        <div class="card-header">SYSTEM DIAGNOSTICS</div>
+                        <div class="metric-big">ACTIVE</div>
+                        <div class="metric-sub">Uptime: 99.9%</div>
+                    </div>
+                    <div class="card" style="grid-column: span 6;">
+                        <div class="card-header">VECTOR MEMORY</div>
+                        <div class="metric-big">CONNECTED</div>
+                        <div class="metric-sub">ChromaDB / Pinecone</div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -530,6 +665,45 @@
         resize();
         draw();
 
+        // --- NAVIGATION LOGIC ---
+        function switchView(viewName, el) {
+            // Update Sidebar
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+
+            // Update Main Area
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-${viewName}`).classList.add('active');
+
+            // Trigger specific logic if needed
+            if (viewName === 'history') loadHistory();
+        }
+
+        // --- SCAN LOGIC ---
+        async function triggerScan() {
+            const btn = document.querySelector('.cyber-btn');
+            btn.style.opacity = '0.7';
+            btn.querySelector('.btn-text').innerText = 'SCANNING...';
+
+            try {
+                await fetch('/api/board/refresh', { method: 'POST' });
+                // Optimistic UI update or wait for poll
+                setTimeout(() => {
+                    btn.style.opacity = '1';
+                    btn.querySelector('.btn-text').innerText = 'INITIATE SCAN';
+                    poll(); // Force immediate update
+                }, 2000);
+            } catch (e) {
+                console.error("Scan Failed", e);
+                btn.querySelector('.btn-text').innerText = 'ERROR';
+            }
+        }
+
+        function loadHistory(historyData) {
+            // This is called by updateUI usually, but if history view is active, ensure we have data.
+            // We'll let updateUI handle DOM population.
+        }
+
         // --- DATA LOGIC ---
         const API_URL = "/api/board/status";
 
@@ -555,24 +729,30 @@
         function updateUI(data) {
             const v = data.verdict || {};
             const agents = data.agents || {};
+            const history = data.history || [];
 
             // Thesis
-            document.getElementById('thesis-text').innerText = v.reason || "Awaiting Analysis...";
-            document.getElementById('risk-type').innerText = (v.risk_type || "Mixed").toUpperCase();
+            const thesisEl = document.getElementById('thesis-text');
+            if (thesisEl) thesisEl.innerText = v.reason || "Awaiting Analysis...";
+
+            const riskTypeEl = document.getElementById('risk-type');
+            if (riskTypeEl) riskTypeEl.innerText = (v.risk_type || "Mixed").toUpperCase();
 
             // Risk Score
             const riskEl = document.getElementById('risk-display');
-            riskEl.innerText = (v.overall_risk || "--").toUpperCase();
+            if (riskEl) {
+                riskEl.innerText = (v.overall_risk || "--").toUpperCase();
+                const risk = (v.overall_risk || "").toLowerCase();
+                riskEl.className = "metric-big " + (risk === 'critical' || risk === 'high' ? 'color-critical' : risk === 'medium' ? 'color-medium' : 'color-low');
+            }
 
-            // Color Class logic
-            const risk = (v.overall_risk || "").toLowerCase();
-            riskEl.className = "metric-big " + (risk === 'critical' || risk === 'high' ? 'color-critical' : risk === 'medium' ? 'color-medium' : 'color-low');
-
-            document.getElementById('confidence-display').innerText = `CONFIDENCE: ${((v.confidence || 0) * 100).toFixed(0)}%`;
+            const confEl = document.getElementById('confidence-display');
+            if (confEl) confEl.innerText = `CONFIDENCE: ${((v.confidence || 0) * 100).toFixed(0)}%`;
 
             // Agent Metrics
             const setVal = (id, val, badValues) => {
                 const el = document.getElementById(id);
+                if (!el) return;
                 el.innerText = val || "--";
                 if (badValues.includes(val)) el.className = "metric-big color-critical";
                 else el.className = "metric-big color-low";
@@ -585,37 +765,53 @@
 
             // Table
             const table = document.getElementById('validation-table');
-            table.innerHTML = `
-                <tr>
-                    <td style="color:var(--accent-primary)">STRATEGY (CEO)</td>
-                    <td>${agents.ceo?.narrative_health || '--'}</td>
-                    <td style="font-family:var(--font-mono); color:var(--text-muted)">Sentiment Analysis (Google News)</td>
-                </tr>
-                <tr>
-                    <td style="color:var(--accent-primary)">EXECUTION (CTO)</td>
-                    <td>${agents.cto?.execution_health || '--'}</td>
-                    <td style="font-family:var(--font-mono); color:var(--text-muted)">GitHub Velocity & Consistency</td>
-                </tr>
-                 <tr>
-                    <td style="color:var(--accent-primary)">PRODUCT (CPO)</td>
-                    <td>${agents.cpo?.product_health || '--'}</td>
-                    <td style="font-family:var(--font-mono); color:var(--text-muted)">Adoption vs Complaints Ratio</td>
-                </tr>
-                <tr>
-                    <td style="color:var(--accent-primary)">FINANCE (CFO)</td>
-                    <td>${agents.cfo?.financial_mode || '--'}</td>
-                    <td style="font-family:var(--font-mono); color:var(--text-muted)">Hiring Trends (Greenhouse)</td>
-                </tr>
-            `;
+            if (table) {
+                table.innerHTML = `
+                    <tr>
+                        <td style="color:var(--accent-primary)">STRATEGY (CEO)</td>
+                        <td>${agents.ceo?.narrative_health || '--'}</td>
+                        <td style="font-family:var(--font-mono); color:var(--text-muted)">Sentiment Analysis (Google News)</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--accent-primary)">EXECUTION (CTO)</td>
+                        <td>${agents.cto?.execution_health || '--'}</td>
+                        <td style="font-family:var(--font-mono); color:var(--text-muted)">GitHub Velocity & Consistency</td>
+                    </tr>
+                     <tr>
+                        <td style="color:var(--accent-primary)">PRODUCT (CPO)</td>
+                        <td>${agents.cpo?.product_health || '--'}</td>
+                        <td style="font-family:var(--font-mono); color:var(--text-muted)">Adoption vs Complaints Ratio</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--accent-primary)">FINANCE (CFO)</td>
+                        <td>${agents.cfo?.financial_mode || '--'}</td>
+                        <td style="font-family:var(--font-mono); color:var(--text-muted)">Hiring Trends (Greenhouse)</td>
+                    </tr>
+                `;
+            }
 
             // Feed
             const feed = document.getElementById('live-feed');
-            feed.innerHTML = `
-                <div class="feed-item"><span class="feed-agent">BOARD</span>${v.summary || v.reason}</div>
-                <div class="feed-item"><span class="feed-agent">CPO</span>${agents.cpo?.explanation || 'No Signal'}</div>
-                <div class="feed-item"><span class="feed-agent">CTO</span>${agents.cto?.explanation || 'No Signal'}</div>
-                <div class="feed-item"><span class="feed-agent">CEO</span>${agents.ceo?.explanation || 'No Signal'}</div>
-            `;
+            if (feed) {
+                feed.innerHTML = `
+                    <div class="feed-item"><span class="feed-agent">BOARD</span>${v.summary || v.reason || 'Initializing...'}</div>
+                    <div class="feed-item"><span class="feed-agent">CPO</span>${agents.cpo?.explanation || 'No Signal'}</div>
+                    <div class="feed-item"><span class="feed-agent">CTO</span>${agents.cto?.explanation || 'No Signal'}</div>
+                    <div class="feed-item"><span class="feed-agent">CEO</span>${agents.ceo?.explanation || 'No Signal'}</div>
+                `;
+            }
+
+            // History
+            const histDiv = document.getElementById('history-list');
+            if (histDiv && history.length > 0) {
+                histDiv.innerHTML = history.map(h => `
+                    <div class="feed-item">
+                        <span class="feed-agent">${new Date(h.timestamp).toLocaleDateString()}</span>
+                        <span class="tag ${h.overall_risk === 'High' ? 'red' : 'green'}">${h.overall_risk}</span>
+                        <div style="margin-top:4px; color:var(--text-muted)">${h.summary || h.reason}</div>
+                    </div>
+                 `).join('');
+            }
         }
 
         init();
